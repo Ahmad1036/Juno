@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:padding="16dp"
+    tools:context=".DashboardActivity">
+
+    <!-- Top Bar -->
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <!-- Date and Time -->
+        <TextView
+            android:id="@+id/date_time_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mon, May 2 • 10:56"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="16sp" />
+
+        <!-- Settings Button -->
+        <ImageButton
+            android:id="@+id/settings_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_preferences" 
+            android:tint="#FFFFFF"
+            android:contentDescription="Settings" />
+    </RelativeLayout>
+
+    <!-- Greeting Section -->
+    <LinearLayout
+        android:id="@+id/greeting_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/top_bar"
+        android:layout_marginTop="24dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/greeting_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="good morning"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/mood_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="how are you feeling today?"
+            android:textColor="#AAAAAA"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="16sp" />
+
+        <!-- Mood Selection -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="😊"
+                android:textSize="24sp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="😐"
+                android:textSize="24sp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="😔"
+                android:textSize="24sp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="😫"
+                android:textSize="24sp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="🥳"
+                android:textSize="24sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Tasks Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/tasks_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/greeting_section"
+        android:layout_marginTop="32dp"
+        app:cardBackgroundColor="#1A1A1A"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="high priority tasks"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="you have 3 tasks due today"
+                android:textColor="#AAAAAA"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:textSize="14sp" />
+
+            <!-- Task Items -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• finish math assignment"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="@font/dots_all_for_now_jl_family"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• study for history exam"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="@font/dots_all_for_now_jl_family"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• research paper outline"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="@font/dots_all_for_now_jl_family"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Quick Cards Row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tasks_card"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <!-- Journal Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/journal_card"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            app:cardBackgroundColor="#1A1A1A"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_edit"
+                    android:tint="#FFFFFF"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="journal"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="@font/dots_all_for_now_jl_family"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Calendar Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/calendar_card"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            app:cardBackgroundColor="#1A1A1A"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_my_calendar"
+                    android:tint="#FFFFFF"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="calendar"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="@font/dots_all_for_now_jl_family"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <!-- Suggestions Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/suggestions_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="64dp"
+        app:cardBackgroundColor="#1A1A1A"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="daily motivation"
+                android:textColor="#FFFFFF"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="'success is not final, failure is not fatal: it is the courage to continue that counts.'"
+                android:textColor="#AAAAAA"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:textSize="14sp"
+                android:lineSpacingExtra="4dp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Add Task FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_task_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:src="@android:drawable/ic_input_add"
+        android:contentDescription="Add Task"
+        app:backgroundTint="#FFFFFF"
+        app:tint="#000000"
+        app:borderWidth="0dp"
+        app:fabSize="normal" />
+
+</RelativeLayout> 

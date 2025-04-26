@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Circular background -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M100,100m-90,0a90,90 0,1 1,180 0a90,90 0,1 1,-180 0" />
+
+    <!-- Outer circle - thin white line -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M100,100m-80,0a80,80 0,1 1,160 0a80,80 0,1 1,-160 0" />
+
+    <!-- Stylized letter J -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:fillColor="#00000000"
+        android:pathData="M80,60 L120,60 L120,120 Q120,140 100,140 Q80,140 80,120" />
+
+    <!-- Dot accent for the J -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M100,45 A5,5 0 0 1 100,55 A5,5 0 0 1 100,45" />
+
+    <!-- Horizontal line - minimal design element -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M60,160 L140,160" />
+
+    <!-- Small dots - Nothing UI style -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,100 A2,2 0 0 1 60,104 A2,2 0 0 1 60,100" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M140,100 A2,2 0 0 1 140,104 A2,2 0 0 1 140,100" />
+</vector> 

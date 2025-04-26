@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Minimal circular outline -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:fillColor="#00000000"
+        android:pathData="M100,100m-80,0a80,80 0,1 1,160 0a80,80 0,1 1,-160 0" />
+
+    <!-- Simplified crown element - just a thin line -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:fillColor="#00000000"
+        android:pathData="M60,70 L80,60 L100,70 L120,60 L140,70" />
+
+    <!-- Abstract face representation - minimal dot eyes -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M85,90 A2,2 0 0 1 85,94 A2,2 0 0 1 85,90" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M115,90 A2,2 0 0 1 115,94 A2,2 0 0 1 115,90" />
+
+    <!-- Peacock feather symbol - minimal curved line -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:fillColor="#00000000"
+        android:pathData="M70,140 C100,160 100,160 130,140" />
+        
+    <!-- Dotted circle pattern - Nothing UI style -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,100 A2,2 0 0 1 60,104 A2,2 0 0 1 60,100" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M140,100 A2,2 0 0 1 140,104 A2,2 0 0 1 140,100" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M100,60 A2,2 0 0 1 100,64 A2,2 0 0 1 100,60" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M100,140 A2,2 0 0 1 100,144 A2,2 0 0 1 100,140" />
+
+</vector> 

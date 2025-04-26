@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:padding="24dp"
+    tools:context=".SignInActivity">
+
+    <TextView
+        android:id="@+id/app_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:text="JUNO"
+        style="@style/TextStyle.DotsAllForNow.Title" />
+
+    <TextView
+        android:id="@+id/welcome_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/app_name"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:text="welcome back"
+        style="@style/TextStyle.DotsAllForNow.Subtitle" />
+        
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:layout_marginTop="40dp">
+
+        <!-- Email Input -->
+        <EditText
+            android:id="@+id/email_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="email address"
+            android:inputType="textEmailAddress"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#AAAAAA"
+            android:background="@drawable/dotted_border"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp" 
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="16sp"/>
+
+        <!-- Password Input -->
+        <EditText
+            android:id="@+id/password_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="password"
+            android:inputType="textPassword"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#AAAAAA"
+            android:background="@drawable/dotted_border"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="16sp" />
+
+        <!-- Sign In Button -->
+        <Button
+            android:id="@+id/sign_in_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="sign in"
+            android:background="@drawable/dotted_button"
+            android:textColor="#FFFFFF"
+            android:padding="16dp"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="16sp" />
+            
+        <!-- Google Sign In Button -->
+        <Button
+            android:id="@+id/google_sign_in_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="sign in with google"
+            android:drawableStart="@android:drawable/btn_star"
+            android:paddingStart="20dp"
+            android:drawablePadding="10dp"
+            android:background="@drawable/dotted_button"
+            android:textColor="#FFFFFF"
+            android:padding="16dp"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="16sp" />
+
+        <!-- Forgot Password Link -->
+        <TextView
+            android:id="@+id/forgot_password_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="16dp"
+            android:text="forgot password?"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="14sp" />
+
+        <!-- Sign Up Link -->
+        <TextView
+            android:id="@+id/sign_up_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            android:text="don't have an account? sign up"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="14sp" />
+    </LinearLayout>
+</RelativeLayout> 

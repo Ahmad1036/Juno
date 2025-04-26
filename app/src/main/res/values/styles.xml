@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Text styles using Dots All For Now JL font -->
+    <style name="TextStyle.DotsAllForNow" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/dots_all_for_now_jl_family</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <style name="TextStyle.DotsAllForNow.Title">
+        <item name="android:textSize">42sp</item>
+        <item name="android:letterSpacing">0.15</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="TextStyle.DotsAllForNow.Subtitle">
+        <item name="android:textSize">18sp</item>
+        <item name="android:letterSpacing">0.05</item>
+        <item name="android:textColor">#AAAAAA</item>
+    </style>
+
+    <style name="TextStyle.DotsAllForNow.Body">
+        <item name="android:textSize">16sp</item>
+        <item name="android:letterSpacing">0.03</item>
+    </style>
+</resources> 

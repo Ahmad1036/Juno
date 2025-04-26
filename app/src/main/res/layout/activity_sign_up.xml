@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:padding="24dp"
+    tools:context=".SignUpActivity">
+
+    <TextView
+        android:id="@+id/app_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:text="JUNO"
+        style="@style/TextStyle.DotsAllForNow.Title" />
+
+    <TextView
+        android:id="@+id/sign_up_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/app_name"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"
+        android:text="create your account"
+        style="@style/TextStyle.DotsAllForNow.Subtitle" />
+        
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:layout_marginTop="40dp">
+
+        <!-- Name Input -->
+        <EditText
+            android:id="@+id/full_name_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="full name"
+            android:inputType="textPersonName"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#AAAAAA"
+            android:background="@drawable/dotted_border"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp" 
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="16sp"/>
+
+        <!-- Email Input -->
+        <EditText
+            android:id="@+id/email_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="email address"
+            android:inputType="textEmailAddress"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#AAAAAA"
+            android:background="@drawable/dotted_border"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp" 
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="16sp"/>
+
+        <!-- Password Input -->
+        <EditText
+            android:id="@+id/password_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="password"
+            android:inputType="textPassword"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#AAAAAA"
+            android:background="@drawable/dotted_border"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="16sp" />
+            
+        <!-- Confirm Password Input -->
+        <EditText
+            android:id="@+id/confirm_password_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="confirm password"
+            android:inputType="textPassword"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#AAAAAA"
+            android:background="@drawable/dotted_border"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="16sp" />
+
+        <!-- Sign Up Button -->
+        <Button
+            android:id="@+id/sign_up_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="create account"
+            android:background="@drawable/dotted_button"
+            android:textColor="#FFFFFF"
+            android:padding="16dp"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="16sp" />
+
+        <!-- Sign In Link -->
+        <TextView
+            android:id="@+id/sign_in_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            android:text="already have an account? sign in"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="14sp" />
+    </LinearLayout>
+    
+    <!-- Google Sign Up Button -->
+    <Button
+        android:id="@+id/google_sign_up_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/terms_text"
+        android:layout_marginBottom="16dp"
+        android:text="sign up with google"
+        android:drawableStart="@android:drawable/btn_star"
+        android:paddingStart="20dp"
+        android:drawablePadding="10dp"
+        android:background="@drawable/dotted_button"
+        android:textColor="#FFFFFF"
+        android:padding="16dp"
+        android:fontFamily="@font/dots_all_for_now_jl_family"
+        android:textSize="16sp" />
+    
+    <!-- Terms and Privacy -->
+    <TextView
+        android:id="@+id/terms_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="24dp"
+        android:text="by creating an account, you agree to our terms of service and privacy policy"
+        android:textColor="#AAAAAA"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:fontFamily="@font/dots_all_for_now_jl_family"
+        android:lineSpacingExtra="4dp" />
+</RelativeLayout> 
