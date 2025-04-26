@@ -57,36 +57,44 @@ public class CalendarEventAdapter extends RecyclerView.Adapter<CalendarEventAdap
             holder.timeTextView.setText(R.string.all_day);
         } else {
             String timeText = timeFormat.format(new Date(event.getStartTime()));
-            if (event.getEndTime() != null) {
+            if (event.getEndTime() > 0) {
                 timeText += " - " + timeFormat.format(new Date(event.getEndTime()));
             }
             holder.timeTextView.setText(timeText);
         }
         
-        // Set event date
-        holder.dateTextView.setText(dateFormat.format(new Date(event.getStartTime())));
-        
-        // Set location if available
-        if (event.getLocation() != null && !event.getLocation().isEmpty()) {
-            holder.locationTextView.setText(event.getLocation());
-            holder.locationTextView.setVisibility(View.VISIBLE);
-        } else {
-            holder.locationTextView.setVisibility(View.GONE);
+        // Set event date if the view has this field
+        if (holder.dateTextView != null) {
+            holder.dateTextView.setText(dateFormat.format(new Date(event.getStartTime())));
         }
         
-        // Set emoji if available
-        if (event.getEmoji() != null && !event.getEmoji().isEmpty()) {
-            holder.emojiTextView.setText(event.getEmoji());
-            holder.emojiTextView.setVisibility(View.VISIBLE);
-        } else {
-            holder.emojiTextView.setVisibility(View.GONE);
+        // Set location if available and the view has this field
+        if (holder.locationTextView != null) {
+            if (event.getLocation() != null && !event.getLocation().isEmpty()) {
+                holder.locationTextView.setText(event.getLocation());
+                holder.locationTextView.setVisibility(View.VISIBLE);
+            } else {
+                holder.locationTextView.setVisibility(View.GONE);
+            }
         }
         
-        // Set completion status
-        if (event.isCompleted()) {
-            holder.statusImageView.setImageResource(R.drawable.ic_completed);
-        } else {
-            holder.statusImageView.setImageResource(R.drawable.ic_incomplete);
+        // Set emoji if available and the view has this field
+        if (holder.emojiTextView != null) {
+            if (event.getEmoji() != null && !event.getEmoji().isEmpty()) {
+                holder.emojiTextView.setText(event.getEmoji());
+                holder.emojiTextView.setVisibility(View.VISIBLE);
+            } else {
+                holder.emojiTextView.setVisibility(View.GONE);
+            }
+        }
+        
+        // Set completion status if the view has this field
+        if (holder.statusImageView != null) {
+            if (event.isCompleted()) {
+                holder.statusImageView.setImageResource(R.drawable.ic_completed);
+            } else {
+                holder.statusImageView.setImageResource(R.drawable.ic_incomplete);
+            }
         }
         
         // Set click listeners
@@ -132,10 +140,16 @@ public class CalendarEventAdapter extends RecyclerView.Adapter<CalendarEventAdap
             super(view);
             titleTextView = view.findViewById(R.id.event_title);
             timeTextView = view.findViewById(R.id.event_time);
-            dateTextView = view.findViewById(R.id.event_date);
-            locationTextView = view.findViewById(R.id.event_location);
-            emojiTextView = view.findViewById(R.id.event_emoji);
-            statusImageView = view.findViewById(R.id.event_status);
+            
+            // Try to find optional views, might not exist in all layouts
+            try {
+                dateTextView = view.findViewById(R.id.event_date);
+                locationTextView = view.findViewById(R.id.event_location);
+                emojiTextView = view.findViewById(R.id.event_emoji);
+                statusImageView = view.findViewById(R.id.event_status);
+            } catch (Exception e) {
+                // These fields might not exist in all layouts
+            }
         }
     }
 } 

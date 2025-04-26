@@ -44,6 +44,7 @@ public class DashboardActivity extends AppCompatActivity {
     private CardView journalCard;
     private CardView calendarCard;
     private CardView suggestionsCard;
+    private CardView notesSummarizerCard;
     private CardView dailyMotivationCard;
     private TextView dailyQuoteText;
     private ImageButton settingsButton;
@@ -87,6 +88,7 @@ public class DashboardActivity extends AppCompatActivity {
         journalCard = findViewById(R.id.journal_card);
         calendarCard = findViewById(R.id.calendar_card);
         suggestionsCard = findViewById(R.id.suggestions_card);
+        notesSummarizerCard = findViewById(R.id.notes_summarizer_card);
         dailyMotivationCard = findViewById(R.id.daily_motivation_card);
         dailyQuoteText = findViewById(R.id.daily_quote_text);
         settingsButton = findViewById(R.id.settings_button);
@@ -204,7 +206,8 @@ public class DashboardActivity extends AppCompatActivity {
         // Calendar card click
         calendarCard.setOnClickListener(v -> {
             // Navigate to Calendar screen
-            Toast.makeText(DashboardActivity.this, "Calendar feature coming soon", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(DashboardActivity.this, CalendarActivity.class);
+            startActivity(intent);
         });
         
         // Create Task card click (new)
@@ -225,6 +228,12 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // Notes Summarizer card click
+        notesSummarizerCard.setOnClickListener(v -> {
+            Intent intent = new Intent(DashboardActivity.this, NotesSummarizerActivity.class);
+            startActivity(intent);
+        });
+
         // Settings button click
         settingsButton.setOnClickListener(v -> {
             // Navigate to Settings screen
@@ -237,7 +246,7 @@ public class DashboardActivity extends AppCompatActivity {
         // Animate UI elements to fade in sequentially
         View[] views = {
             dateTimeText, greetingText, moodText,
-            tasksCard, journalCard, calendarCard, suggestionsCard, dailyMotivationCard,
+            tasksCard, journalCard, calendarCard, suggestionsCard, notesSummarizerCard, dailyMotivationCard,
             settingsButton
         };
         
