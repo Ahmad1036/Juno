@@ -3,6 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" 
+                     android:maxSdkVersion="28" />
 
     <application
         android:allowBackup="true"
@@ -25,6 +30,14 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".CreateTaskActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Juno.NoActionBar" />
+        <activity
+            android:name=".TaskDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Juno.NoActionBar" />
+        <activity
             android:name=".SignInActivity"
             android:exported="false"
             android:theme="@style/Theme.Juno.NoActionBar" />
@@ -38,6 +51,14 @@
             android:theme="@style/Theme.Juno.NoActionBar" />
         <activity
             android:name=".ResetPasswordActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Juno.NoActionBar" />
+        <activity
+            android:name=".EditProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Juno.NoActionBar" />
+        <activity
+            android:name=".ChangePasswordActivity"
             android:exported="false"
             android:theme="@style/Theme.Juno.NoActionBar" />
         <activity

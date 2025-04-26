@@ -98,12 +98,16 @@ public class SettingsActivity extends AppCompatActivity {
         
         // Edit Profile button
         editProfileButton.setOnClickListener(v -> {
-            Toast.makeText(SettingsActivity.this, "Edit Profile coming soon", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(SettingsActivity.this, EditProfileActivity.class);
+            startActivity(intent);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
         
         // Change Password button
         changePasswordButton.setOnClickListener(v -> {
-            Toast.makeText(SettingsActivity.this, "Change Password coming soon", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(SettingsActivity.this, ChangePasswordActivity.class);
+            startActivity(intent);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
         
         // Logout button

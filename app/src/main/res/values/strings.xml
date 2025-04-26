@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Juno</string>
     <string name="default_web_client_id">586442288097-uvwxyz1234567890abcdefghijklmnop.apps.googleusercontent.com</string>
+    <string name="back">Back</string>
 </resources>

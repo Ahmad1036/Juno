@@ -239,49 +239,63 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void createAccount(String name, String email, String password) {
-        Log.d(TAG, "Attempting to create user: " + email);
-        showProgressBar(true);
+        // Check if email is valid
+        if (!isValidEmail(email)) {
+            showProgressBar(false);
+            emailEditText.setError("Invalid email format.");
+            return;
+        }
+        
+        String encodedEmail = encodeEmail(email);
         
         // First check if email already exists
-        String encodedEmail = encodeEmail(email);
-        mDatabase.child("user_emails").child(encodedEmail).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    // Email already exists
-                    showProgressBar(false);
-                    emailEditText.setError("Email already in use. Please use a different email or sign in.");
-                    
-                    // Add toast message
-                    Toast.makeText(SignUpActivity.this, 
-                        "An account with this email already exists", Toast.LENGTH_LONG).show();
-                    
-                    // Scroll to the email field
-                    emailEditText.requestFocus();
-                } else {
-                    // Email doesn't exist, proceed with account creation
-                    proceedWithAccountCreation(name, email, password);
+        mDatabase.child("users").orderByChild("email").equalTo(email).addListenerForSingleValueEvent(
+            new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        // Email already exists
+                        showProgressBar(false);
+                        emailEditText.setError("This email is already registered.");
+                        Toast toast = Toast.makeText(SignUpActivity.this, 
+                            "An account with this email already exists.", Toast.LENGTH_LONG);
+                        View view = toast.getView();
+                        view.setBackgroundColor(getResources().getColor(R.color.primary_dark));
+                        TextView text = view.findViewById(android.R.id.message);
+                        text.setTextColor(android.graphics.Color.WHITE);
+                        toast.show();
+                    } else {
+                        // Email is available, proceed with account creation
+                        proceedWithAccountCreation(name, email, password);
+                    }
                 }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Database error occurred
-                showProgressBar(false);
-                Log.e(TAG, "Database error checking email: " + databaseError.getMessage());
-                Toast.makeText(SignUpActivity.this, 
-                    "Error checking email availability: " + databaseError.getMessage(), 
-                    Toast.LENGTH_LONG).show();
-            }
-        });
+                
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    showProgressBar(false);
+                    Log.e(TAG, "Error checking email existence: " + databaseError.getMessage());
+                    Toast.makeText(SignUpActivity.this, 
+                        "Error checking email: " + databaseError.getMessage(), 
+                        Toast.LENGTH_LONG).show();
+                }
+            });
     }
     
     private void proceedWithAccountCreation(String name, String email, String password) {
         // Generate a unique ID for the user
         String userId = mDatabase.child("users").push().getKey();
         
+        if (userId == null) {
+            // Handle the error case where key generation fails
+            showProgressBar(false);
+            Toast.makeText(SignUpActivity.this, "Failed to create account: could not generate user ID", 
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        
         // Hash the password before storing
         String hashedPassword = hashPassword(password);
+        String encodedEmail = encodeEmail(email);
         
         // Create a User map
         Map<String, Object> user = new HashMap<>();
@@ -290,15 +304,17 @@ public class SignUpActivity extends AppCompatActivity {
         user.put("password", hashedPassword); // Store hashed password
         user.put("createdAt", System.currentTimeMillis());
         
-        // Save to Firebase Realtime Database
-        mDatabase.child("users").child(userId).setValue(user)
+        // Create a multi-path update map
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/users/" + userId, user);
+        childUpdates.put("/user_emails/" + encodedEmail, userId);
+        
+        // Save all data atomically
+        mDatabase.updateChildren(childUpdates)
             .addOnSuccessListener(aVoid -> {
                 showProgressBar(false);
                 Log.d(TAG, "User data saved successfully");
                 Toast.makeText(SignUpActivity.this, "Account created successfully!", Toast.LENGTH_SHORT).show();
-                
-                // Also save a lookup by email for easier login later
-                mDatabase.child("user_emails").child(encodeEmail(email)).setValue(userId);
                 
                 // Store user session locally
                 storeUserSession(userId, name, email);
@@ -311,6 +327,8 @@ public class SignUpActivity extends AppCompatActivity {
                 Log.e(TAG, "Failed to save user data", e);
                 Toast.makeText(SignUpActivity.this, "Failed to save user data: " + e.getMessage(), 
                         Toast.LENGTH_LONG).show();
+                // Still navigate to dashboard
+                navigateToDashboard();
             });
     }
     
@@ -408,6 +426,7 @@ public class SignUpActivity extends AppCompatActivity {
     
     private void saveUserToDatabase(String userId, String name, String email) {
         Log.d(TAG, "Saving user to database: " + userId);
+        String encodedEmail = encodeEmail(email);
         
         // Create a User map
         Map<String, Object> user = new HashMap<>();
@@ -415,12 +434,21 @@ public class SignUpActivity extends AppCompatActivity {
         user.put("email", email);
         user.put("createdAt", System.currentTimeMillis());
         
-        // Save to Firebase Realtime Database
-        mDatabase.child("users").child(userId).setValue(user)
+        // Create a multi-path update map
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/users/" + userId, user);
+        childUpdates.put("/user_emails/" + encodedEmail, userId);
+        
+        // Save all data atomically
+        mDatabase.updateChildren(childUpdates)
             .addOnSuccessListener(aVoid -> {
                 showProgressBar(false);
                 Log.d(TAG, "User data saved successfully");
                 Toast.makeText(SignUpActivity.this, "Account created successfully!", Toast.LENGTH_SHORT).show();
+                
+                // Store user session locally
+                storeUserSession(userId, name, email);
+                
                 // Navigate to Dashboard
                 navigateToDashboard();
             })

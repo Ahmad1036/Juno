@@ -38,6 +38,13 @@ dependencies {
     implementation("com.google.firebase:firebase-database:20.3.0")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation("com.google.firebase:firebase-analytics:21.5.0")
+    implementation("com.google.firebase:firebase-storage:20.3.0")
+    
+    // Image handling
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+    implementation("com.firebaseui:firebase-ui-storage:8.0.2")
+    implementation("de.hdodenhof:circleimageview:3.1.0")
 
     implementation(libs.appcompat)
     implementation(libs.material)

@@ -146,6 +146,17 @@ public class DashboardActivity extends AppCompatActivity {
             // Navigate to Calendar screen
             Toast.makeText(DashboardActivity.this, "Calendar feature coming soon", Toast.LENGTH_SHORT).show();
         });
+        
+        // Create Task card click (new)
+        CardView createTaskCard = findViewById(R.id.create_task_card);
+        if (createTaskCard != null) {
+            createTaskCard.setOnClickListener(v -> {
+                // Navigate to Task Creation screen
+                Intent intent = new Intent(DashboardActivity.this, CreateTaskActivity.class);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            });
+        }
 
         // Suggestions card click
         suggestionsCard.setOnClickListener(v -> {
@@ -163,7 +174,9 @@ public class DashboardActivity extends AppCompatActivity {
         // Add task button click
         addTaskButton.setOnClickListener(v -> {
             // Navigate to Task Creation screen
-            Toast.makeText(DashboardActivity.this, "Add task feature coming soon", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(DashboardActivity.this, CreateTaskActivity.class);
+            startActivity(intent);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
     }
 

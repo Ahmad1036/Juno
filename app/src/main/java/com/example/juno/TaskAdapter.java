@@ -1,6 +1,7 @@
 package com.example.juno;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,22 +58,21 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         }
         
         // Set priority indicator
-        int priorityColor;
-        switch (task.getPriority()) {
+        int priorityValue = task.getPriorityInt();
+        switch (priorityValue) {
             case 1: // High
-                priorityColor = R.color.priority_high;
+                holder.priorityIndicator.setBackgroundResource(R.drawable.priority_high_indicator);
                 break;
             case 2: // Medium
-                priorityColor = R.color.priority_medium;
+                holder.priorityIndicator.setBackgroundResource(R.drawable.priority_medium_indicator);
                 break;
             case 3: // Low
-                priorityColor = R.color.priority_low;
+                holder.priorityIndicator.setBackgroundResource(R.drawable.priority_low_indicator);
                 break;
             default:
-                priorityColor = R.color.priority_low;
+                holder.priorityIndicator.setBackgroundResource(R.drawable.priority_low_indicator);
                 break;
         }
-        holder.priorityIndicator.setBackgroundResource(R.drawable.priority_low_indicator);
         
         // Set completion status
         holder.completedCheckBox.setChecked(task.isCompleted());
@@ -83,6 +83,13 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         } else {
             holder.titleTextView.setPaintFlags(holder.titleTextView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
+
+        // Set click listener to open task details
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, TaskDetailActivity.class);
+            intent.putExtra("taskId", task.getId());
+            context.startActivity(intent);
+        });
     }
 
     @Override

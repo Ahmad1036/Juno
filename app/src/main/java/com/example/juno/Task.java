@@ -13,19 +13,21 @@ public class Task {
     private boolean completed;
     private long dueDate;
     private long createdAt;
-    private int priority; // 1-High, 2-Medium, 3-Low
+    private String priority; // "high", "medium", "low"
+    private String imageUrl; // URL for task image (if any)
 
     // Required empty constructor for Firebase
     public Task() {
     }
 
-    public Task(String title, String description, long dueDate, int priority) {
+    public Task(String title, String description, long dueDate, String priority) {
         this.title = title;
         this.description = description;
         this.dueDate = dueDate;
         this.priority = priority;
         this.completed = false;
         this.createdAt = new Date().getTime();
+        this.imageUrl = null;
     }
 
     @Exclude
@@ -77,12 +79,40 @@ public class Task {
         this.createdAt = createdAt;
     }
 
-    public int getPriority() {
+    public String getPriority() {
         return priority;
     }
 
-    public void setPriority(int priority) {
+    public void setPriority(String priority) {
         this.priority = priority;
+    }
+
+    /**
+     * Get the priority as an integer for use with drawables
+     * 1 = high, 2 = medium, 3 = low
+     */
+    @Exclude
+    public int getPriorityInt() {
+        if (priority == null) {
+            return 2; // Default to medium
+        }
+        
+        switch (priority.toLowerCase()) {
+            case "high":
+                return 1;
+            case "low":
+                return 3;
+            default: // "medium" or any other value
+                return 2;
+        }
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     @Exclude
@@ -94,6 +124,7 @@ public class Task {
         result.put("dueDate", dueDate);
         result.put("createdAt", createdAt);
         result.put("priority", priority);
+        result.put("imageUrl", imageUrl);
         
         return result;
     }

@@ -102,7 +102,7 @@ public class TasksActivity extends AppCompatActivity {
     }
 
     private void loadTasks() {
-        mDatabase.child("user_tasks").child(userId).addValueEventListener(new ValueEventListener() {
+        mDatabase.child("users").child(userId).child("tasks").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 taskList.clear();
@@ -136,17 +136,15 @@ public class TasksActivity extends AppCompatActivity {
     }
 
     private void onTaskClick(Task task) {
-        // Go back to dashboard since TaskDetailActivity doesn't exist yet
-        finish();
-        // Commented out original code causing error
-        // Intent intent = new Intent(TasksActivity.this, TaskDetailActivity.class);
-        // intent.putExtra("taskId", task.getId());
-        // startActivity(intent);
+        // Navigate to TaskDetailActivity
+        Intent intent = new Intent(TasksActivity.this, TaskDetailActivity.class);
+        intent.putExtra("taskId", task.getId());
+        startActivity(intent);
     }
 
     private void onTaskCompleteToggle(Task task) {
         // Update task completion status in database
-        mDatabase.child("user_tasks").child(userId).child(task.getId()).child("completed")
+        mDatabase.child("users").child(userId).child("tasks").child(task.getId()).child("completed")
                 .setValue(task.isCompleted())
                 .addOnSuccessListener(aVoid -> {
                     String message = task.isCompleted() ? "Task marked as complete" : "Task marked as incomplete";
