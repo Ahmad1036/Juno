@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -14,6 +13,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.FirebaseDatabase;
@@ -21,7 +21,7 @@ import com.google.firebase.database.FirebaseDatabase;
 public class SplashActivity extends AppCompatActivity {
 
     private static final String TAG = "SplashActivity";
-    private static final long SPLASH_DELAY = 2000; // 2 seconds
+    private static final long SPLASH_DELAY = 4000; // 3 seconds - giving more time to see the full GIF
 
     private ImageView logoImageView;
     private TextView taglineTextView;
@@ -38,11 +38,22 @@ public class SplashActivity extends AppCompatActivity {
         logoImageView = findViewById(R.id.logo_image);
         taglineTextView = findViewById(R.id.tagline_text);
 
-        // Set up animations
+        // Load GIF using Glide
+        loadLogoGif();
+
+        // Set up animations for tagline
         setupAnimations();
 
         // Navigate to next screen after delay
         navigateAfterDelay();
+    }
+
+    private void loadLogoGif() {
+        // Load the GIF from raw directory using Glide
+        Glide.with(this)
+             .asGif()
+             .load(R.raw.logo_animation)  // Make sure to put your logo_animation.gif in the raw folder
+             .into(logoImageView);
     }
 
     private void initializeFirebase() {
@@ -69,12 +80,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void setupAnimations() {
-        // Logo animation
-        Animation fadeIn = AnimationUtils.loadAnimation(this, android.R.anim.fade_in);
-        fadeIn.setDuration(1000);
-        logoImageView.startAnimation(fadeIn);
-
-        // Tagline animation (starts after logo)
+        // Tagline animation
         Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
         slideUp.setStartOffset(500);
         taglineTextView.startAnimation(slideUp);

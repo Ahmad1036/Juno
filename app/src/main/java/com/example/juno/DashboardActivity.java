@@ -44,6 +44,8 @@ public class DashboardActivity extends AppCompatActivity {
     private CardView journalCard;
     private CardView calendarCard;
     private CardView suggestionsCard;
+    private CardView dailyMotivationCard;
+    private TextView dailyQuoteText;
     private ImageButton settingsButton;
     
     // Task-related views
@@ -85,6 +87,8 @@ public class DashboardActivity extends AppCompatActivity {
         journalCard = findViewById(R.id.journal_card);
         calendarCard = findViewById(R.id.calendar_card);
         suggestionsCard = findViewById(R.id.suggestions_card);
+        dailyMotivationCard = findViewById(R.id.daily_motivation_card);
+        dailyQuoteText = findViewById(R.id.daily_quote_text);
         settingsButton = findViewById(R.id.settings_button);
         
         // Initialize task views
@@ -115,6 +119,9 @@ public class DashboardActivity extends AppCompatActivity {
         
         // Load latest journal and analyze mood
         loadLatestJournal();
+        
+        // Load daily motivational quote
+        loadDailyQuote();
     }
     
     @Override
@@ -213,8 +220,9 @@ public class DashboardActivity extends AppCompatActivity {
 
         // Suggestions card click
         suggestionsCard.setOnClickListener(v -> {
-            // Navigate to Suggestions screen
-            Toast.makeText(DashboardActivity.this, "Suggestions feature coming soon", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(DashboardActivity.this, SuggestionsActivity.class);
+            intent.putExtra("userId", userId);
+            startActivity(intent);
         });
 
         // Settings button click
@@ -229,7 +237,7 @@ public class DashboardActivity extends AppCompatActivity {
         // Animate UI elements to fade in sequentially
         View[] views = {
             dateTimeText, greetingText, moodText,
-            tasksCard, journalCard, calendarCard, suggestionsCard,
+            tasksCard, journalCard, calendarCard, suggestionsCard, dailyMotivationCard,
             settingsButton
         };
         
@@ -373,11 +381,23 @@ public class DashboardActivity extends AppCompatActivity {
             return;
         }
         
-        // Use the MoodImageHelper to detect mood
-        String mood = MoodImageHelper.detectMoodFromJournal(content);
-        updateMoodDisplay(mood);
-        
-        Log.d(TAG, "Analyzed journal mood: " + mood);
+        // Use Gemini API to analyze mood
+        GeminiMoodAnalyzer.analyzeMoodAsync(content, mood -> {
+            // We need to run UI updates on the main thread
+            runOnUiThread(() -> {
+                updateMoodDisplay(mood);
+                Log.d(TAG, "Analyzed journal mood with Gemini: " + mood);
+            });
+            
+            // Save the mood to the journal in Firebase
+            journal.setMood(mood);
+            String journalId = journal.getId();
+            if (journalId != null && !journalId.isEmpty()) {
+                mDatabase.child("journals").child(journalId).child("mood").setValue(mood)
+                    .addOnSuccessListener(aVoid -> Log.d(TAG, "Journal mood updated successfully"))
+                    .addOnFailureListener(e -> Log.e(TAG, "Error updating journal mood", e));
+            }
+        });
     }
 
     private void updateMoodDisplay(String mood) {
@@ -465,5 +485,41 @@ public class DashboardActivity extends AppCompatActivity {
     private int dpToPx(int dp) {
         float density = getResources().getDisplayMetrics().density;
         return Math.round(dp * density);
+    }
+
+    /**
+     * Loads and displays a daily motivational quote
+     * Uses a predefined list of quotes and displays a different one based on the day of year
+     */
+    private void loadDailyQuote() {
+        // List of inspirational quotes
+        String[] quotes = {
+            "'Success is not final, failure is not fatal: it is the courage to continue that counts.' - Winston Churchill",
+            "'Believe you can and you're halfway there.' - Theodore Roosevelt",
+            "'The only way to do great work is to love what you do.' - Steve Jobs",
+            "'It does not matter how slowly you go as long as you do not stop.' - Confucius",
+            "'Everything you've ever wanted is on the other side of fear.' - George Addair",
+            "'The future belongs to those who believe in the beauty of their dreams.' - Eleanor Roosevelt",
+            "'You are never too old to set another goal or to dream a new dream.' - C.S. Lewis",
+            "'The secret of getting ahead is getting started.' - Mark Twain",
+            "'Don't watch the clock; do what it does. Keep going.' - Sam Levenson",
+            "'Quality is not an act, it is a habit.' - Aristotle",
+            "'The only person you are destined to become is the person you decide to be.' - Ralph Waldo Emerson",
+            "'Your time is limited, don't waste it living someone else's life.' - Steve Jobs",
+            "'Life is 10% what happens to us and 90% how we react to it.' - Charles R. Swindoll",
+            "'Strive not to be a success, but rather to be of value.' - Albert Einstein",
+            "'The mind is everything. What you think you become.' - Buddha"
+        };
+        
+        // Get the day of year to select a quote
+        Calendar calendar = Calendar.getInstance();
+        int dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+        
+        // Select a quote based on the day of year
+        int quoteIndex = dayOfYear % quotes.length;
+        String dailyQuote = quotes[quoteIndex];
+        
+        // Set the quote text
+        dailyQuoteText.setText(dailyQuote);
     }
 } 

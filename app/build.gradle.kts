@@ -53,6 +53,9 @@ android {
         annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
         implementation("com.firebaseui:firebase-ui-storage:8.0.2")
         implementation("de.hdodenhof:circleimageview:3.1.0")
+        
+        // Networking
+        implementation("com.squareup.okhttp3:okhttp:4.11.0")
 
         implementation(libs.appcompat)
         implementation(libs.material)

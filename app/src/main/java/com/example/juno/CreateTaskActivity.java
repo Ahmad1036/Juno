@@ -81,8 +81,8 @@ public class CreateTaskActivity extends AppCompatActivity {
     private LinearLayout lowPriorityButton;
     private LinearLayout mediumPriorityButton;
     private LinearLayout highPriorityButton;
-    private Button cancelButton;
-    private Button saveTaskButton;
+    private ImageButton cancelButton;
+    private ImageButton saveTaskButton;
 
     // Data
     private List<String> taskLists = new ArrayList<>();
@@ -515,8 +515,7 @@ public class CreateTaskActivity extends AppCompatActivity {
             }
         }
         
-        // Update save button text
-        saveTaskButton.setText("update task");
+        // No need to update save button text, it's an icon now
     }
 
     // Helper method to show progress bar
@@ -524,12 +523,6 @@ public class CreateTaskActivity extends AppCompatActivity {
         // You might want to add a ProgressBar in your layout for this
         // For now, we'll just disable the save button
         saveTaskButton.setEnabled(!show);
-        if (show) {
-            saveTaskButton.setText("Loading...");
-        } else {
-            boolean isEditing = getIntent().getBooleanExtra("isEditing", false);
-            saveTaskButton.setText(isEditing ? "update task" : "save task");
-        }
     }
 
     private void saveTask() {
@@ -540,9 +533,8 @@ public class CreateTaskActivity extends AppCompatActivity {
             return;
         }
         
-        // Show loading state
+        // Show loading state by disabling button
         saveTaskButton.setEnabled(false);
-        saveTaskButton.setText("Saving...");
         
         // Create task data using the Task class field names
         final Map<String, Object> taskData = new HashMap<>();
@@ -584,7 +576,6 @@ public class CreateTaskActivity extends AppCompatActivity {
         try {
             // Show encoding message
             Toast.makeText(this, "Processing image...", Toast.LENGTH_SHORT).show();
-            saveTaskButton.setText("Processing image...");
             
             Bitmap bitmap;
             if (selectedImageUri != null) {
@@ -639,7 +630,6 @@ public class CreateTaskActivity extends AppCompatActivity {
             Log.e(TAG, "Cannot save task: User ID is null or empty");
             Toast.makeText(this, "Authentication error. Cannot save task.", Toast.LENGTH_LONG).show();
             saveTaskButton.setEnabled(true);
-            saveTaskButton.setText("Save Task");
             return;
         }
         
@@ -661,13 +651,11 @@ public class CreateTaskActivity extends AppCompatActivity {
                         Log.e(TAG, "Failed to " + (isEditing ? "update" : "create") + " task", e);
                         Toast.makeText(CreateTaskActivity.this, "Failed to " + (isEditing ? "update" : "create") + " task: " + e.getMessage(), Toast.LENGTH_LONG).show();
                         saveTaskButton.setEnabled(true);
-                        saveTaskButton.setText("Save Task");
                     });
         } else {
             Log.e(TAG, "Failed to generate task ID");
             Toast.makeText(this, "Failed to create task ID", Toast.LENGTH_SHORT).show();
             saveTaskButton.setEnabled(true);
-            saveTaskButton.setText("Save Task");
         }
     }
 

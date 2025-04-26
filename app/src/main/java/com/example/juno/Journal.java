@@ -16,6 +16,7 @@ public class Journal {
     private long timestamp;
     private long lastUpdated;
     private String userId;
+    private String mood; // Added mood field
 
     // Required empty constructor for Firebase
     public Journal() {
@@ -28,6 +29,7 @@ public class Journal {
         this.timestamp = timestamp;
         this.lastUpdated = timestamp; // Initially same as creation time
         this.userId = userId;
+        this.mood = "Neutral"; // Default mood
     }
 
     @Exclude
@@ -87,6 +89,14 @@ public class Journal {
         this.lastUpdated = lastUpdated;
     }
 
+    public String getMood() {
+        return mood != null ? mood : "Neutral";
+    }
+
+    public void setMood(String mood) {
+        this.mood = mood;
+    }
+
     @Exclude
     public String getLastUpdatedFormatted() {
         SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.getDefault());
@@ -112,6 +122,7 @@ public class Journal {
         result.put("timestamp", timestamp);
         result.put("lastUpdated", lastUpdated);
         result.put("userId", userId);
+        result.put("mood", mood);
         
         return result;
     }

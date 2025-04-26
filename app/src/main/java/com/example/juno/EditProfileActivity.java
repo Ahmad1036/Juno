@@ -362,8 +362,8 @@ public class EditProfileActivity extends AppCompatActivity {
                 // Use Glide to load image
                 Glide.with(EditProfileActivity.this)
                         .load(uri)
-                        .placeholder(R.drawable.profile_placeholder)
-                        .error(R.drawable.profile_placeholder)
+                        .placeholder(R.drawable.default_profile)
+                        .error(R.drawable.default_profile)
                         .into(profileImageView);
                 showProgressBar(false);
             }).addOnFailureListener(e -> {
