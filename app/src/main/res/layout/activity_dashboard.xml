@@ -140,47 +140,35 @@
                 android:textSize="16sp" />
 
             <TextView
+                android:id="@+id/dashboard_tasks_count"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="you have 3 tasks due today"
+                android:text="loading tasks..."
                 android:textColor="#AAAAAA"
                 android:fontFamily="@font/dots_all_for_now_jl_family"
                 android:textSize="14sp" />
 
             <!-- Task Items -->
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/dashboard_tasks_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:orientation="vertical">
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="• finish math assignment"
-                    android:textColor="#FFFFFF"
-                    android:fontFamily="@font/dots_all_for_now_jl_family"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="• study for history exam"
-                    android:textColor="#FFFFFF"
-                    android:fontFamily="@font/dots_all_for_now_jl_family"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="• research paper outline"
-                    android:textColor="#FFFFFF"
-                    android:fontFamily="@font/dots_all_for_now_jl_family"
-                    android:textSize="14sp" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/dashboard_no_tasks_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="no tasks yet"
+                android:textColor="#AAAAAA"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:textSize="14sp"
+                android:gravity="center"
+                android:visibility="gone" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

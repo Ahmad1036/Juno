@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    app:cardBackgroundColor="#1A1A1A"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Date -->
+        <TextView
+            android:id="@+id/item_journal_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:text="may 10, 2023"
+            android:textColor="#AAAAAA"
+            android:textSize="14sp" />
+
+        <!-- Journal Entry Preview -->
+        <TextView
+            android:id="@+id/item_journal_preview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:maxLines="3"
+            android:text="This is a preview of the journal entry content that will be displayed in the list..."
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+
+        <!-- Image Indicator and Gratitude Indicator -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <!-- Image Indicator -->
+            <TextView
+                android:id="@+id/item_has_image_indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:drawableStart="@android:drawable/ic_menu_gallery"
+                android:drawablePadding="4dp"
+                android:drawableTint="#AAAAAA"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:text="image"
+                android:textColor="#AAAAAA"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+            <!-- Gratitude Indicator -->
+            <TextView
+                android:id="@+id/item_has_gratitude_indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@android:drawable/star_big_on"
+                android:drawablePadding="4dp"
+                android:drawableTint="#AAAAAA"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:text="gratitude"
+                android:textColor="#AAAAAA"
+                android:textSize="12sp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView> 

@@ -2,17 +2,23 @@ package com.example.juno;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -27,6 +33,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 public class TaskDetailActivity extends AppCompatActivity {
 
@@ -34,13 +44,14 @@ public class TaskDetailActivity extends AppCompatActivity {
     
     // UI Components
     private ImageButton backButton;
-    private ImageView priorityIndicator;
+    private View priorityIndicator;
     private TextView taskTitleView;
     private TextView dueDateView;
     private TextView descriptionView;
     private CheckBox completedCheckbox;
     private CardView taskImageCard;
     private ImageView taskImageView;
+    private ProgressBar imageProgressBar;
     private Button editTaskButton;
     private Button deleteTaskButton;
     
@@ -59,9 +70,6 @@ public class TaskDetailActivity extends AppCompatActivity {
         // Setup toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
         
         // Initialize Firebase
         mDatabase = FirebaseDatabase.getInstance("https://juno-aa7d2-default-rtdb.firebaseio.com/").getReference();
@@ -99,6 +107,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         completedCheckbox = findViewById(R.id.completed_checkbox);
         taskImageCard = findViewById(R.id.task_image_card);
         taskImageView = findViewById(R.id.task_image);
+        imageProgressBar = findViewById(R.id.image_progress_bar);
         editTaskButton = findViewById(R.id.edit_task_button);
         deleteTaskButton = findViewById(R.id.delete_task_button);
     }
@@ -217,14 +226,83 @@ public class TaskDetailActivity extends AppCompatActivity {
         setPriorityIndicator(currentTask.getPriorityInt());
         
         // Load task image if available
-        if (currentTask.getImageUrl() != null && !currentTask.getImageUrl().isEmpty()) {
+        loadTaskImage();
+    }
+    
+    private void loadTaskImage() {
+        // Check for image data (Base64 encoded string)
+        String imageData = currentTask.getImageData();
+        
+        // For backward compatibility, also check imageUrl if imageData isn't available
+        String imageUrl = currentTask.getImageUrl();
+        
+        if (imageData != null && !imageData.isEmpty()) {
+            // Show the image card and progress indicator
             taskImageCard.setVisibility(View.VISIBLE);
+            imageProgressBar.setVisibility(View.VISIBLE);
+            
+            try {
+                // Decode Base64 string to bitmap
+                byte[] decodedString = Base64.decode(imageData, Base64.DEFAULT);
+                Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                
+                // Display the decoded bitmap
+                taskImageView.setImageBitmap(decodedBitmap);
+                imageProgressBar.setVisibility(View.GONE);
+                Log.d(TAG, "Base64 image loaded successfully");
+                
+                // Set up image click for full-screen view
+                taskImageView.setOnClickListener(v -> {
+                    // You could launch a full-screen image viewer here
+                    Toast.makeText(TaskDetailActivity.this, "Opening image in full view", Toast.LENGTH_SHORT).show();
+                });
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to decode Base64 image: " + e.getMessage());
+                imageProgressBar.setVisibility(View.GONE);
+                taskImageCard.setVisibility(View.GONE);
+                Toast.makeText(TaskDetailActivity.this, "Failed to load image", Toast.LENGTH_SHORT).show();
+            }
+        } 
+        // Fallback to imageUrl for backward compatibility
+        else if (imageUrl != null && !imageUrl.isEmpty()) {
+            // Show the image card and progress indicator
+            taskImageCard.setVisibility(View.VISIBLE);
+            imageProgressBar.setVisibility(View.VISIBLE);
+            
+            // Log the image URL for debugging
+            Log.d(TAG, "Falling back to image URL: " + imageUrl);
+            
+            // Load the image with Glide
             Glide.with(this)
-                 .load(currentTask.getImageUrl())
-                 .placeholder(R.drawable.placeholder_image)
-                 .error(R.drawable.error_image)
-                 .into(taskImageView);
+                .load(imageUrl)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        Log.e(TAG, "Failed to load image: " + e);
+                        imageProgressBar.setVisibility(View.GONE);
+                        taskImageCard.setVisibility(View.GONE);
+                        Toast.makeText(TaskDetailActivity.this, "Failed to load image", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        Log.d(TAG, "Image URL loaded successfully");
+                        imageProgressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .placeholder(R.drawable.placeholder_image)
+                .error(R.drawable.error_image)
+                .into(taskImageView);
+            
+            // Set up image click for full-screen view
+            taskImageView.setOnClickListener(v -> {
+                // You could launch a full-screen image viewer here
+                Toast.makeText(TaskDetailActivity.this, "Opening image in full view", Toast.LENGTH_SHORT).show();
+            });
         } else {
+            // No image available
             taskImageCard.setVisibility(View.GONE);
         }
     }
@@ -244,7 +322,7 @@ public class TaskDetailActivity extends AppCompatActivity {
                 break;
         }
         
-        priorityIndicator.setImageDrawable(ContextCompat.getDrawable(this, priorityDrawable));
+        priorityIndicator.setBackgroundResource(priorityDrawable);
     }
     
     @Override

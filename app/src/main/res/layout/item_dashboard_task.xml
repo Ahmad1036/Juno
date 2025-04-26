@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dashboard_task_title"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="• Task title"
+    android:textColor="#FFFFFF"
+    android:fontFamily="@font/dots_all_for_now_jl_family"
+    android:textSize="14sp"
+    android:layout_marginBottom="8dp"
+    android:maxLines="1"
+    android:ellipsize="end" /> 

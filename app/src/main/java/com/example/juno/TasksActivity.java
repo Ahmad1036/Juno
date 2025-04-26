@@ -81,11 +81,10 @@ public class TasksActivity extends AppCompatActivity {
 
         // Set up click listeners
         addTaskFab.setOnClickListener(v -> {
-            // Since TaskCreationActivity doesn't exist yet, just go back to Dashboard
-            finish();
-            // Commented out the original code that would cause error
-            // Intent intent = new Intent(TasksActivity.this, TaskCreationActivity.class);
-            // startActivity(intent);
+            // Launch CreateTaskActivity instead of going back
+            Intent intent = new Intent(TasksActivity.this, CreateTaskActivity.class);
+            startActivity(intent);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
 
         backButton.setOnClickListener(v -> finish());

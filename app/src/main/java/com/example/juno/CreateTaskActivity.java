@@ -6,10 +6,12 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -92,20 +94,25 @@ public class CreateTaskActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private StorageReference mStorageRef;
     private String userId;
+    private boolean isTaskCompleted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_task);
 
+        // Check if we're in edit mode
+        boolean isEditing = getIntent().getBooleanExtra("isEditing", false);
+        String taskId = getIntent().getStringExtra("taskId");
+
         // Initialize Firebase
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://juno-aa7d2-default-rtdb.firebaseio.com/");
         mDatabase = database.getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
-        // Get user ID
+        // Get user ID from SharedPreferences
         userId = getSharedPreferences("JunoUserPrefs", MODE_PRIVATE).getString("userId", null);
-        if (userId == null) {
+        if (userId == null || userId.isEmpty()) {
             Toast.makeText(this, "Not logged in", Toast.LENGTH_SHORT).show();
             finish();
             return;
@@ -113,6 +120,19 @@ public class CreateTaskActivity extends AppCompatActivity {
 
         // Initialize UI components
         initializeViews();
+
+        // Change title if in edit mode
+        if (isEditing) {
+            TextView titleTextView = findViewById(R.id.titleTextView);
+            if (titleTextView != null) {
+                titleTextView.setText("edit task");
+            }
+            
+            // Load the existing task data for editing
+            if (taskId != null && !taskId.isEmpty()) {
+                loadTaskForEditing(taskId);
+            }
+        }
         
         // Set up task lists spinner
         fetchTaskLists();
@@ -243,6 +263,15 @@ public class CreateTaskActivity extends AppCompatActivity {
                 this, android.R.layout.simple_spinner_item, taskLists);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         taskListSpinner.setAdapter(adapter);
+        
+        // If editing, try to select the correct task list
+        boolean isEditing = getIntent().getBooleanExtra("isEditing", false);
+        if (isEditing && selectedTaskList != null) {
+            int position = taskLists.indexOf(selectedTaskList);
+            if (position >= 0) {
+                taskListSpinner.setSelection(position);
+            }
+        }
         
         taskListSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -420,6 +449,89 @@ public class CreateTaskActivity extends AppCompatActivity {
                 R.color.priority_high : R.drawable.priority_button_background);
     }
 
+    private void loadTaskForEditing(String taskId) {
+        // Show loading indicator
+        showProgressBar(true);
+        
+        // Load the task data from Firebase
+        mDatabase.child("users").child(userId).child("tasks").child(taskId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        Task task = dataSnapshot.getValue(Task.class);
+                        if (task != null) {
+                            // Populate UI with task data
+                            fillTaskDataInUI(task);
+                        } else {
+                            Toast.makeText(CreateTaskActivity.this, "Failed to load task data", Toast.LENGTH_SHORT).show();
+                        }
+                        showProgressBar(false);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.e(TAG, "Error loading task for editing", databaseError.toException());
+                        Toast.makeText(CreateTaskActivity.this, "Failed to load task: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                        showProgressBar(false);
+                    }
+                });
+    }
+
+    private void fillTaskDataInUI(Task task) {
+        // Set description
+        if (task.getDescription() != null) {
+            taskDescriptionEditText.setText(task.getDescription());
+        }
+        
+        // Set task list (spinner selection)
+        if (task.getTitle() != null) {
+            selectedTaskList = task.getTitle();
+            // Spinner selection will be handled after task lists are fetched
+        }
+        
+        // Set due date if available
+        if (task.getDueDate() > 0) {
+            selectedDateTime.setTimeInMillis(task.getDueDate());
+            updateDateText();
+            updateTimeText();
+        }
+        
+        // Set priority
+        if (task.getPriority() != null) {
+            setPriority(task.getPriority());
+        }
+        
+        // Store completion status in a class variable to preserve it when updating
+        isTaskCompleted = task.isCompleted();
+        
+        // Set image if available
+        if (task.getImageData() != null && !task.getImageData().isEmpty()) {
+            try {
+                byte[] decodedString = Base64.decode(task.getImageData(), Base64.DEFAULT);
+                capturedImageBitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                processImage(capturedImageBitmap);
+            } catch (Exception e) {
+                Log.e(TAG, "Error loading image data", e);
+            }
+        }
+        
+        // Update save button text
+        saveTaskButton.setText("update task");
+    }
+
+    // Helper method to show progress bar
+    private void showProgressBar(boolean show) {
+        // You might want to add a ProgressBar in your layout for this
+        // For now, we'll just disable the save button
+        saveTaskButton.setEnabled(!show);
+        if (show) {
+            saveTaskButton.setText("Loading...");
+        } else {
+            boolean isEditing = getIntent().getBooleanExtra("isEditing", false);
+            saveTaskButton.setText(isEditing ? "update task" : "save task");
+        }
+    }
+
     private void saveTask() {
         String taskDescription = taskDescriptionEditText.getText().toString().trim();
         
@@ -432,72 +544,127 @@ public class CreateTaskActivity extends AppCompatActivity {
         saveTaskButton.setEnabled(false);
         saveTaskButton.setText("Saving...");
         
-        // Create task data
+        // Create task data using the Task class field names
         final Map<String, Object> taskData = new HashMap<>();
+        taskData.put("title", selectedTaskList); // Use list name as title
         taskData.put("description", taskDescription);
-        taskData.put("list", selectedTaskList);
-        taskData.put("priority", taskPriority);
-        taskData.put("created_at", System.currentTimeMillis());
-        taskData.put("due_date", selectedDateTime.getTimeInMillis());
-        taskData.put("completed", false);
         
-        // If there's an image, upload it first
+        // Check if we're in edit mode to preserve completion status
+        boolean isEditing = getIntent().getBooleanExtra("isEditing", false);
+        String taskId = getIntent().getStringExtra("taskId");
+        
+        // Use the stored completion status for editing, or default to false for new tasks
+        taskData.put("completed", isEditing ? isTaskCompleted : false);
+        
+        taskData.put("dueDate", selectedDateTime.getTimeInMillis());
+        if (!isEditing) {
+            // Only set createdAt for new tasks
+            taskData.put("createdAt", System.currentTimeMillis());
+        }
+        taskData.put("priority", taskPriority);
+        
+        // If there's an image, encode it as Base64 and add to task data
         if (selectedImageUri != null || capturedImageBitmap != null) {
-            uploadImageAndSaveTask(taskData);
+            encodeImageAndSaveTask(taskData, isEditing, taskId);
         } else {
             // No image, just save the task
-            saveTaskToDatabase(taskData);
+            saveTaskToDatabase(taskData, isEditing, taskId);
         }
     }
 
-    private void uploadImageAndSaveTask(final Map<String, Object> taskData) {
-        String imageFileName = "task_images/" + userId + "_" + System.currentTimeMillis() + ".jpg";
-        StorageReference imageRef = mStorageRef.child(imageFileName);
-        
-        UploadTask uploadTask;
-        if (selectedImageUri != null) {
-            // Upload from gallery URI
-            uploadTask = imageRef.putFile(selectedImageUri);
-        } else {
-            // Upload from captured bitmap
+    private void encodeImageAndSaveTask(final Map<String, Object> taskData, boolean isEditing, String taskId) {
+        // Check if user ID is available
+        if (userId == null || userId.isEmpty()) {
+            Log.e(TAG, "Cannot encode image: User ID not available");
+            Toast.makeText(this, "User ID missing. Task will be saved without image.", Toast.LENGTH_SHORT).show();
+            saveTaskToDatabase(taskData, isEditing, taskId); // Save task without image
+            return;
+        }
+
+        try {
+            // Show encoding message
+            Toast.makeText(this, "Processing image...", Toast.LENGTH_SHORT).show();
+            saveTaskButton.setText("Processing image...");
+            
+            Bitmap bitmap;
+            if (selectedImageUri != null) {
+                // Get bitmap from gallery URI
+                bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImageUri);
+            } else {
+                // Use captured bitmap
+                bitmap = capturedImageBitmap;
+            }
+            
+            // Resize bitmap to reduce storage size (max width/height of 500px)
+            bitmap = resizeBitmap(bitmap, 500);
+            
+            // Convert bitmap to Base64 string
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            capturedImageBitmap.compress(Bitmap.CompressFormat.JPEG, 85, baos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 30, baos); // Use low quality (30%) to reduce size
             byte[] imageData = baos.toByteArray();
-            uploadTask = imageRef.putBytes(imageData);
+            String base64Image = Base64.encodeToString(imageData, Base64.DEFAULT);
+            
+            // Add base64 image string to task data
+            Log.d(TAG, "Image encoded successfully, length: " + base64Image.length());
+            taskData.put("imageData", base64Image);
+            
+            // Save task with encoded image
+            saveTaskToDatabase(taskData, isEditing, taskId);
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error encoding image", e);
+            Toast.makeText(this, "Error processing image. Task saved without image.", Toast.LENGTH_SHORT).show();
+            saveTaskToDatabase(taskData, isEditing, taskId);
+        }
+    }
+    
+    private Bitmap resizeBitmap(Bitmap bitmap, int maxSize) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        
+        if (width <= maxSize && height <= maxSize) {
+            return bitmap; // No need to resize
         }
         
-        uploadTask.addOnSuccessListener(taskSnapshot -> {
-            imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                taskData.put("image_url", uri.toString());
-                saveTaskToDatabase(taskData);
-            }).addOnFailureListener(e -> {
-                Log.e(TAG, "Failed to get download URL", e);
-                saveTaskToDatabase(taskData); // Save task without image
-            });
-        }).addOnFailureListener(e -> {
-            Log.e(TAG, "Failed to upload image", e);
-            saveTaskToDatabase(taskData); // Save task without image
-        });
+        float ratio = Math.min((float) maxSize / width, (float) maxSize / height);
+        int newWidth = Math.round(width * ratio);
+        int newHeight = Math.round(height * ratio);
+        
+        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
     }
 
-    private void saveTaskToDatabase(Map<String, Object> taskData) {
-        // Generate a unique task ID
-        String taskId = mDatabase.child("users").child(userId).child("tasks").push().getKey();
+    private void saveTaskToDatabase(Map<String, Object> taskData, boolean isEditing, String taskId) {
+        // Check if userId is valid
+        if (userId == null || userId.isEmpty()) {
+            Log.e(TAG, "Cannot save task: User ID is null or empty");
+            Toast.makeText(this, "Authentication error. Cannot save task.", Toast.LENGTH_LONG).show();
+            saveTaskButton.setEnabled(true);
+            saveTaskButton.setText("Save Task");
+            return;
+        }
         
-        if (taskId != null) {
-            mDatabase.child("users").child(userId).child("tasks").child(taskId)
+        // Add a log to show we're attempting to save
+        Log.d(TAG, "Attempting to save task to database for user: " + userId);
+        
+        // Generate a unique task ID
+        final String taskIdToUse = taskId != null && !taskId.isEmpty() ? taskId : mDatabase.child("users").child(userId).child("tasks").push().getKey();
+        
+        if (taskIdToUse != null) {
+            mDatabase.child("users").child(userId).child("tasks").child(taskIdToUse)
                     .setValue(taskData)
                     .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(CreateTaskActivity.this, "Task created successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CreateTaskActivity.this, "Task " + (isEditing ? "updated" : "created") + " successfully", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "Task " + (isEditing ? "updated" : "created") + " successfully with ID: " + taskIdToUse);
                         finish();
                     })
                     .addOnFailureListener(e -> {
-                        Log.e(TAG, "Failed to create task", e);
-                        Toast.makeText(CreateTaskActivity.this, "Failed to create task: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Log.e(TAG, "Failed to " + (isEditing ? "update" : "create") + " task", e);
+                        Toast.makeText(CreateTaskActivity.this, "Failed to " + (isEditing ? "update" : "create") + " task: " + e.getMessage(), Toast.LENGTH_LONG).show();
                         saveTaskButton.setEnabled(true);
                         saveTaskButton.setText("Save Task");
                     });
         } else {
+            Log.e(TAG, "Failed to generate task ID");
             Toast.makeText(this, "Failed to create task ID", Toast.LENGTH_SHORT).show();
             saveTaskButton.setEnabled(true);
             saveTaskButton.setText("Save Task");

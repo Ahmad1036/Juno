@@ -15,6 +15,7 @@ public class Task {
     private long createdAt;
     private String priority; // "high", "medium", "low"
     private String imageUrl; // URL for task image (if any)
+    private String imageData; // Base64 encoded image data
 
     // Required empty constructor for Firebase
     public Task() {
@@ -28,6 +29,7 @@ public class Task {
         this.completed = false;
         this.createdAt = new Date().getTime();
         this.imageUrl = null;
+        this.imageData = null;
     }
 
     @Exclude
@@ -114,6 +116,14 @@ public class Task {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+    
+    public String getImageData() {
+        return imageData;
+    }
+    
+    public void setImageData(String imageData) {
+        this.imageData = imageData;
+    }
 
     @Exclude
     public Map<String, Object> toMap() {
@@ -125,6 +135,7 @@ public class Task {
         result.put("createdAt", createdAt);
         result.put("priority", priority);
         result.put("imageUrl", imageUrl);
+        result.put("imageData", imageData);
         
         return result;
     }

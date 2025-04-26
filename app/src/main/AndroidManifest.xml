@@ -77,6 +77,14 @@
             android:name=".TasksActivity"
             android:exported="false"
             android:theme="@style/Theme.Juno.NoActionBar" />
+        <activity
+            android:name=".JournalActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Juno.NoActionBar" />
+        <activity
+            android:name=".JournalListActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Juno.NoActionBar" />
     </application>
 
 </manifest>

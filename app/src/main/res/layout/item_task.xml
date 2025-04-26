@@ -49,16 +49,32 @@
                 android:textSize="14sp"
                 tools:text="This is a sample task description that could potentially be very long and span multiple lines." />
 
-            <TextView
-                android:id="@+id/tv_due_date"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:drawableStart="@drawable/ic_calendar"
-                android:drawablePadding="4dp"
-                android:textColor="@color/accent"
-                android:textSize="12sp"
-                tools:text="Apr 15, 2023" />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_due_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_calendar"
+                    android:drawablePadding="4dp"
+                    android:textColor="@color/accent"
+                    android:textSize="12sp"
+                    tools:text="Apr 15, 2023" />
+
+                <ImageView
+                    android:id="@+id/image_indicator"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="Task has an image"
+                    android:visibility="gone"
+                    tools:visibility="visible"
+                    android:src="@drawable/ic_image"/>
+            </LinearLayout>
 
         </LinearLayout>
 

@@ -7,10 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -84,6 +87,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             holder.titleTextView.setPaintFlags(holder.titleTextView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
 
+        // Show image thumbnail if available
+        if (task.getImageUrl() != null && !task.getImageUrl().isEmpty()) {
+            holder.imageIndicator.setVisibility(View.VISIBLE);
+            Glide.with(context)
+                 .load(task.getImageUrl())
+                 .centerCrop()
+                 .thumbnail(0.1f)
+                 .into(holder.imageIndicator);
+        } else {
+            holder.imageIndicator.setVisibility(View.GONE);
+        }
+
         // Set click listener to open task details
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, TaskDetailActivity.class);
@@ -108,6 +123,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         TextView dueDateTextView;
         View priorityIndicator;
         CheckBox completedCheckBox;
+        ImageView imageIndicator;
 
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -116,6 +132,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             dueDateTextView = itemView.findViewById(R.id.tv_due_date);
             priorityIndicator = itemView.findViewById(R.id.view_priority_indicator);
             completedCheckBox = itemView.findViewById(R.id.checkbox_complete);
+            imageIndicator = itemView.findViewById(R.id.image_indicator);
 
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();

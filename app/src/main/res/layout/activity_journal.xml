@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    tools:context=".JournalActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Top Bar -->
+        <RelativeLayout
+            android:id="@+id/journal_top_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <ImageButton
+                android:id="@+id/journal_back_button"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Back"
+                android:src="@drawable/ic_back"
+                android:tint="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/journal_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="16dp"
+                android:layout_toEndOf="@id/journal_back_button"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:text="journal"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp" />
+
+            <ImageButton
+                android:id="@+id/journal_delete_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="16dp"
+                android:layout_toStartOf="@id/journal_save_button"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Delete"
+                android:src="@android:drawable/ic_menu_delete"
+                android:tint="#FFFFFF"
+                android:visibility="gone" />
+
+            <ImageButton
+                android:id="@+id/journal_save_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Save"
+                android:src="@android:drawable/ic_menu_save"
+                android:tint="#FFFFFF" />
+        </RelativeLayout>
+
+        <!-- Journal Content -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Date Display -->
+                <TextView
+                    android:id="@+id/journal_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/dots_all_for_now_jl_family"
+                    android:text="today, may 10"
+                    android:textColor="#AAAAAA"
+                    android:textSize="16sp" />
+
+                <!-- Last Updated Display -->
+                <TextView
+                    android:id="@+id/journal_last_updated"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/dots_all_for_now_jl_family"
+                    android:text="last edited: may 10, 4:30 pm"
+                    android:textColor="#888888"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+
+                <!-- Journal Entry Text -->
+                <EditText
+                    android:id="@+id/journal_entry"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@null"
+                    android:fontFamily="@font/dots_all_for_now_jl_family"
+                    android:gravity="top|start"
+                    android:hint="write your thoughts for today..."
+                    android:inputType="textMultiLine"
+                    android:minHeight="150dp"
+                    android:textColor="#FFFFFF"
+                    android:textColorHint="#777777"
+                    android:textSize="16sp" />
+
+                <!-- Gratitude Prompt Section -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    app:cardBackgroundColor="#1A1A1A"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/dots_all_for_now_jl_family"
+                            android:text="gratitude prompt"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/gratitude_prompt"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="@font/dots_all_for_now_jl_family"
+                            android:text="what are three things you're grateful for today?"
+                            android:textColor="#AAAAAA"
+                            android:textSize="14sp" />
+
+                        <EditText
+                            android:id="@+id/gratitude_entry"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:background="@null"
+                            android:fontFamily="@font/dots_all_for_now_jl_family"
+                            android:gravity="top|start"
+                            android:hint="type your response here..."
+                            android:inputType="textMultiLine"
+                            android:minHeight="80dp"
+                            android:textColor="#FFFFFF"
+                            android:textColorHint="#777777"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Image Attachment Preview -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/journal_image_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="#1A1A1A"
+                    app:cardCornerRadius="8dp"
+                    app:cardElevation="0dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/journal_image"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:contentDescription="Journal Image"
+                            android:scaleType="centerCrop" />
+
+                        <ImageButton
+                            android:id="@+id/remove_image_button"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_margin="8dp"
+                            android:background="@drawable/circle_background"
+                            android:contentDescription="Remove Image"
+                            android:src="@android:drawable/ic_menu_close_clear_cancel"
+                            android:tint="#FFFFFF" />
+                    </RelativeLayout>
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- Bottom Action Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#1A1A1A"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <ImageButton
+                android:id="@+id/voice_input_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Voice Input"
+                android:src="@android:drawable/ic_btn_speak_now"
+                android:tint="#FFFFFF" />
+
+            <ImageButton
+                android:id="@+id/text_to_speech_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Read Aloud"
+                android:src="@android:drawable/ic_lock_silent_mode_off"
+                android:tint="#FFFFFF" />
+
+            <ImageButton
+                android:id="@+id/attach_image_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Attach Image"
+                android:src="@android:drawable/ic_menu_gallery"
+                android:tint="#FFFFFF" />
+
+        </LinearLayout>
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout> 
