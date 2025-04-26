@@ -6,4 +6,11 @@
     </style>
 
     <style name="Theme.Juno" parent="Base.Theme.Juno" />
+    
+    <style name="Theme.Juno.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
 </resources>
