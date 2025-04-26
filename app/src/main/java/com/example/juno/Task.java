@@ -16,6 +16,7 @@ public class Task {
     private String priority; // "high", "medium", "low"
     private String imageUrl; // URL for task image (if any)
     private String imageData; // Base64 encoded image data
+    private int listId; // ID of the task list this task belongs to
 
     // Required empty constructor for Firebase
     public Task() {
@@ -30,6 +31,12 @@ public class Task {
         this.createdAt = new Date().getTime();
         this.imageUrl = null;
         this.imageData = null;
+        this.listId = 0; // Default list ID
+    }
+
+    public Task(String title, String description, long dueDate, String priority, int listId) {
+        this(title, description, dueDate, priority);
+        this.listId = listId;
     }
 
     @Exclude
@@ -125,6 +132,14 @@ public class Task {
         this.imageData = imageData;
     }
 
+    public int getListId() {
+        return listId;
+    }
+    
+    public void setListId(int listId) {
+        this.listId = listId;
+    }
+
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
@@ -136,6 +151,7 @@ public class Task {
         result.put("priority", priority);
         result.put("imageUrl", imageUrl);
         result.put("imageData", imageData);
+        result.put("listId", listId);
         
         return result;
     }

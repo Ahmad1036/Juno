@@ -10,6 +10,7 @@
     <color name="accent">#FF4081</color>
     <color name="dark_gray">#666666</color>
     <color name="light_gray">#DDDDDD</color>
+    <color name="colorPrimary">#2196F3</color>
     
     <!-- Task Priority Colors -->
     <color name="priority_high">#F44336</color>

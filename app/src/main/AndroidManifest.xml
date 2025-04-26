@@ -78,6 +78,10 @@
             android:exported="false"
             android:theme="@style/Theme.Juno.NoActionBar" />
         <activity
+            android:name=".AllTasksActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Juno.NoActionBar" />
+        <activity
             android:name=".JournalActivity"
             android:exported="false"
             android:theme="@style/Theme.Juno.NoActionBar" />
@@ -85,6 +89,19 @@
             android:name=".JournalListActivity"
             android:exported="false"
             android:theme="@style/Theme.Juno.NoActionBar" />
+        <activity
+            android:name=".AllChecklistsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Juno.NoActionBar" />
+        <activity
+            android:name=".CreateChecklistActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChecklistDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditChecklistActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

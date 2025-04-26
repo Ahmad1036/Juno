@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +35,7 @@ public class DashboardActivity extends AppCompatActivity {
 
     private static final String TAG = "DashboardActivity";
     private static final int MAX_DASHBOARD_TASKS = 3;
+    private static final int MOOD_IMAGE_CORNER_RADIUS = 20; // 20dp corner radius
 
     private TextView dateTimeText;
     private TextView greetingText;
@@ -42,7 +45,6 @@ public class DashboardActivity extends AppCompatActivity {
     private CardView calendarCard;
     private CardView suggestionsCard;
     private ImageButton settingsButton;
-    private ImageButton addTaskButton;
     
     // Task-related views
     private RecyclerView dashboardTasksRecyclerView;
@@ -84,7 +86,6 @@ public class DashboardActivity extends AppCompatActivity {
         calendarCard = findViewById(R.id.calendar_card);
         suggestionsCard = findViewById(R.id.suggestions_card);
         settingsButton = findViewById(R.id.settings_button);
-        addTaskButton = findViewById(R.id.add_task_button);
         
         // Initialize task views
         dashboardTasksRecyclerView = findViewById(R.id.dashboard_tasks_recycler_view);
@@ -111,6 +112,9 @@ public class DashboardActivity extends AppCompatActivity {
         
         // Load tasks for dashboard
         loadDashboardTasks();
+        
+        // Load latest journal and analyze mood
+        loadLatestJournal();
     }
     
     @Override
@@ -179,7 +183,7 @@ public class DashboardActivity extends AppCompatActivity {
         // Tasks card click
         tasksCard.setOnClickListener(v -> {
             // Navigate to Tasks screen
-            Intent intent = new Intent(DashboardActivity.this, TasksActivity.class);
+            Intent intent = new Intent(DashboardActivity.this, AllTasksActivity.class);
             startActivity(intent);
         });
 
@@ -219,14 +223,6 @@ public class DashboardActivity extends AppCompatActivity {
             Intent intent = new Intent(DashboardActivity.this, SettingsActivity.class);
             startActivity(intent);
         });
-
-        // Add task button click
-        addTaskButton.setOnClickListener(v -> {
-            // Navigate to Task Creation screen
-            Intent intent = new Intent(DashboardActivity.this, CreateTaskActivity.class);
-            startActivity(intent);
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        });
     }
 
     private void setupAnimations() {
@@ -234,7 +230,7 @@ public class DashboardActivity extends AppCompatActivity {
         View[] views = {
             dateTimeText, greetingText, moodText,
             tasksCard, journalCard, calendarCard, suggestionsCard,
-            settingsButton, addTaskButton
+            settingsButton
         };
         
         for (int i = 0; i < views.length; i++) {
@@ -336,5 +332,138 @@ public class DashboardActivity extends AppCompatActivity {
         Intent intent = new Intent(this, TaskDetailActivity.class);
         intent.putExtra("taskId", task.getId());
         startActivity(intent);
+    }
+
+    private void loadLatestJournal() {
+        if (userId == null || userId.isEmpty()) {
+            Log.e(TAG, "User ID is empty, cannot load latest journal");
+            return;
+        }
+        
+        Log.d(TAG, "Loading latest journal entry for user ID: " + userId);
+        
+        // Query journals and order by timestamp to get the latest one
+        mDatabase.child("journals")
+                .orderByChild("timestamp")
+                .limitToLast(1)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot journalSnapshot : dataSnapshot.getChildren()) {
+                            Journal journal = journalSnapshot.getValue(Journal.class);
+                            if (journal != null && userId.equals(journal.getUserId())) {
+                                analyzeJournalMood(journal);
+                                return;
+                            }
+                        }
+                        Log.d(TAG, "No journal entries found for this user");
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.e(TAG, "Error loading latest journal entry", databaseError.toException());
+                    }
+                });
+    }
+
+    private void analyzeJournalMood(Journal journal) {
+        String content = journal.getContent();
+        if (content == null || content.isEmpty()) {
+            Log.d(TAG, "Journal content is empty, cannot analyze mood");
+            return;
+        }
+        
+        // Use the MoodImageHelper to detect mood
+        String mood = MoodImageHelper.detectMoodFromJournal(content);
+        updateMoodDisplay(mood);
+        
+        Log.d(TAG, "Analyzed journal mood: " + mood);
+    }
+
+    private void updateMoodDisplay(String mood) {
+        // Find the LinearLayout containing the mood emojis
+        LinearLayout moodLayout = findViewById(R.id.mood_selection_layout);
+        if (moodLayout == null) {
+            Log.e(TAG, "Mood selection layout not found");
+            return;
+        }
+        
+        // Clear existing mood display
+        moodLayout.removeAllViews();
+        
+        // Create an ImageView for the mood
+        ImageView moodImageView = new ImageView(this);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 
+                dpToPx(183)); // Set height to 183dp
+        moodImageView.setLayoutParams(layoutParams);
+        moodImageView.setAdjustViewBounds(true);
+        moodImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        
+        // Try to load the PNG image using the SVGUtils
+        // This will also apply the border and rounded corners
+        boolean success = SVGUtils.loadMoodImage(this, moodImageView, mood);
+        if (success) {
+            // Add to layout
+            moodLayout.addView(moodImageView);
+            
+            // Update the mood text
+            moodText.setText("your current mood based on journal");
+            return;
+        }
+        
+        // Fallback to colored shapes if PNG loading fails
+        int colorResourceId = 0;
+        switch (mood) {
+            case "Happy":
+                colorResourceId = R.drawable.mood_happy;
+                break;
+            case "Excited":
+                colorResourceId = R.drawable.mood_excited;
+                break;
+            case "Tired":
+                colorResourceId = R.drawable.mood_tired;
+                break;
+            case "Stressed":
+                colorResourceId = R.drawable.mood_stressed;
+                break;
+            case "Bored":
+                colorResourceId = R.drawable.mood_bored;
+                break;
+            case "Neutral":
+            default:
+                colorResourceId = R.drawable.mood_neutral;
+                break;
+        }
+        
+        try {
+            moodImageView.setImageResource(colorResourceId);
+            moodLayout.addView(moodImageView);
+            // Update the mood text
+            moodText.setText("your current mood based on journal");
+        } catch (Exception e) {
+            Log.e(TAG, "Error loading mood color: " + e.getMessage());
+            displayFallbackMood(moodLayout, mood);
+        }
+    }
+
+    private void displayFallbackMood(LinearLayout moodLayout, String mood) {
+        // Display fallback text for the mood
+        TextView fallbackText = new TextView(this);
+        fallbackText.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        fallbackText.setGravity(android.view.Gravity.CENTER);
+        fallbackText.setTextSize(24);
+        fallbackText.setText("Current mood: " + mood);
+        fallbackText.setTextColor(getResources().getColor(android.R.color.white));
+        
+        moodLayout.addView(fallbackText);
+    }
+
+    // Convert dp to pixels
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
     }
 } 

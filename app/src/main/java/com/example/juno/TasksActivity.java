@@ -101,16 +101,47 @@ public class TasksActivity extends AppCompatActivity {
     }
 
     private void loadTasks() {
-        mDatabase.child("users").child(userId).child("tasks").addValueEventListener(new ValueEventListener() {
+        // Add logging to help diagnose issues
+        Log.d(TAG, "Loading tasks for user ID: " + userId);
+        
+        if (userId == null || userId.isEmpty()) {
+            Log.e(TAG, "User ID is empty or null, cannot load tasks");
+            Toast.makeText(TasksActivity.this, "Authentication error: User ID not found", Toast.LENGTH_SHORT).show();
+            emptyStateText.setVisibility(View.VISIBLE);
+            emptyStateText.setText("Unable to load tasks. Please sign in again.");
+            tasksRecyclerView.setVisibility(View.GONE);
+            return;
+        }
+        
+        // Show loading state
+        emptyStateText.setText("Loading tasks...");
+        emptyStateText.setVisibility(View.VISIBLE);
+        tasksRecyclerView.setVisibility(View.GONE);
+        
+        DatabaseReference tasksRef = mDatabase.child("users").child(userId).child("tasks");
+        Log.d(TAG, "Database reference path: " + tasksRef.toString());
+        
+        tasksRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 taskList.clear();
                 
+                Log.d(TAG, "Task data snapshot exists: " + dataSnapshot.exists());
+                Log.d(TAG, "Task data snapshot has children: " + dataSnapshot.hasChildren());
+                Log.d(TAG, "Task data snapshot child count: " + dataSnapshot.getChildrenCount());
+                
                 for (DataSnapshot taskSnapshot : dataSnapshot.getChildren()) {
-                    Task task = taskSnapshot.getValue(Task.class);
-                    if (task != null) {
-                        task.setId(taskSnapshot.getKey());
-                        taskList.add(task);
+                    try {
+                        Task task = taskSnapshot.getValue(Task.class);
+                        if (task != null) {
+                            task.setId(taskSnapshot.getKey());
+                            taskList.add(task);
+                            Log.d(TAG, "Added task: " + task.getTitle());
+                        } else {
+                            Log.w(TAG, "Failed to parse task for key: " + taskSnapshot.getKey());
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error parsing task: " + e.getMessage());
                     }
                 }
                 
@@ -118,9 +149,12 @@ public class TasksActivity extends AppCompatActivity {
                 
                 // Show/hide empty state
                 if (taskList.isEmpty()) {
+                    Log.d(TAG, "No tasks found, showing empty state");
                     emptyStateText.setVisibility(View.VISIBLE);
+                    emptyStateText.setText("No tasks found. Add a task to get started!");
                     tasksRecyclerView.setVisibility(View.GONE);
                 } else {
+                    Log.d(TAG, "Found " + taskList.size() + " tasks, showing task list");
                     emptyStateText.setVisibility(View.GONE);
                     tasksRecyclerView.setVisibility(View.VISIBLE);
                 }
@@ -129,7 +163,10 @@ public class TasksActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.w(TAG, "loadTasks:onCancelled", databaseError.toException());
-                Toast.makeText(TasksActivity.this, "Failed to load tasks.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TasksActivity.this, "Failed to load tasks: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                emptyStateText.setText("Failed to load tasks. Please try again.");
+                emptyStateText.setVisibility(View.VISIBLE);
+                tasksRecyclerView.setVisibility(View.GONE);
             }
         });
     }
