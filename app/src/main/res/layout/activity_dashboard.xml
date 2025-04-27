@@ -25,6 +25,19 @@
             android:fontFamily="@font/dots_all_for_now_jl_family"
             android:textSize="16sp" />
 
+        <!-- Analytics Button -->
+        <ImageButton
+            android:id="@+id/analytics_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_toStartOf="@id/notification_button"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Analytics"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_analytics"
+            android:tint="#FFFFFF" />
+
         <!-- Notification Button -->
         <ImageButton
             android:id="@+id/notification_button"

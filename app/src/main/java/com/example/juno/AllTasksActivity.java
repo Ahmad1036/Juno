@@ -33,9 +33,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 public class AllTasksActivity extends AppCompatActivity {
@@ -388,8 +390,20 @@ public class AllTasksActivity extends AppCompatActivity {
     }
     
     private void updateTaskCompletionStatus(Task task) {
-        mDatabase.child("users").child(userId).child("tasks").child(task.getId()).child("completed")
-                .setValue(task.isCompleted())
+        // If task is completed, set completed date to current time
+        if (task.isCompleted()) {
+            task.setCompletedDate(System.currentTimeMillis());
+        } else {
+            task.setCompletedDate(0); // Reset completed date if task is marked incomplete
+        }
+        
+        // Update both completed status and completedDate in database
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("completed", task.isCompleted());
+        updates.put("completedDate", task.getCompletedDate());
+        
+        mDatabase.child("users").child(userId).child("tasks").child(task.getId())
+                .updateChildren(updates)
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "Task completion status updated for: " + task.getId());
                     // Refresh the task list

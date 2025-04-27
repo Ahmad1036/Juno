@@ -134,6 +134,10 @@
             android:name=".NotificationsActivity"
             android:exported="false"
             android:theme="@style/Theme.Juno.NoActionBar" />
+        <activity
+            android:name=".AnalyticsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Juno.NoActionBar" />
             
         <!-- Background service for syncing tasks -->
         <service

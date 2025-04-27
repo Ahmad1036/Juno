@@ -175,3 +175,59 @@ To modify or extend the customization features:
    - Update the settings UI in activity_settings.xml
    - Implement the application logic in the appropriate utility class
    - Apply the settings in relevant activities or adapters 
+
+## Notifications Feature
+
+The Notifications feature allows users to manage all app notifications in one place.
+
+### Key Components
+
+- **NotificationsActivity**: Central hub for viewing and managing all notifications
+- **Notification Filtering**: Options to filter by read/unread and notification type
+- **Batch Actions**: Mark multiple notifications as read or delete them at once
+- **Real-time Updates**: Notifications update in real-time when new ones arrive
+
+**Location**: `app/src/main/java/com/example/juno/NotificationsActivity.java`
+
+## Analytics Feature
+
+The Analytics feature provides users with insights about their task completion patterns and productivity.
+
+### Key Components
+
+- **AnalyticsActivity**: Displays task statistics and performance metrics
+- **Completion Rate Tracking**: Shows percentage of tasks completed on time vs. overdue
+- **Priority Distribution**: Visualizes task distribution across different priority levels
+- **Time-based Analysis**: Tracks completion patterns over time
+- **Performance Feedback**: Provides motivational feedback based on user performance
+
+**Location**: `app/src/main/java/com/example/juno/AnalyticsActivity.java`
+
+## Task Completion Tracking
+
+Enhanced task completion tracking system to improve analytics accuracy.
+
+### Key Components
+
+- **Completion Timestamp**: Records exact time when tasks are marked as complete
+- **Deadline Comparison**: Accurately determines if tasks were completed before or after deadlines
+- **Improved Analytics**: Enables more precise reporting on user productivity patterns
+- **Legacy Support**: Includes fallback logic for tasks without completion timestamps
+
+**Implementation**:
+- `Task.java`: Added `completedDate` field with getters and setters
+- `AllTasksActivity.java`: Updated task completion logic to record timestamps
+- `AnalyticsActivity.java`: Enhanced analytics to utilize completion timestamps
+
+## Settings
+
+The Settings screen allows users to customize their app experience.
+
+### Key Components
+
+- **Theme Selection**: Toggle between light and dark themes
+- **Notification Preferences**: Control how and when notifications appear
+- **Analytics Visibility**: Configure which metrics are displayed
+- **Account Management**: Update user profile and preferences
+
+**Location**: `app/src/main/java/com/example/juno/SettingsActivity.java` 

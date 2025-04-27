@@ -13,6 +13,7 @@ public class Task {
     private boolean completed;
     private long dueDate;
     private long createdAt;
+    private long completedDate; // Timestamp when the task was completed
     private String priority; // "high", "medium", "low"
     private String imageUrl; // URL for task image (if any)
     private String imageData; // Base64 encoded image data
@@ -88,6 +89,14 @@ public class Task {
         this.createdAt = createdAt;
     }
 
+    public long getCompletedDate() {
+        return completedDate;
+    }
+
+    public void setCompletedDate(long completedDate) {
+        this.completedDate = completedDate;
+    }
+
     public String getPriority() {
         return priority;
     }
@@ -148,6 +157,7 @@ public class Task {
         result.put("completed", completed);
         result.put("dueDate", dueDate);
         result.put("createdAt", createdAt);
+        result.put("completedDate", completedDate);
         result.put("priority", priority);
         result.put("imageUrl", imageUrl);
         result.put("imageData", imageData);
