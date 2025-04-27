@@ -69,4 +69,25 @@
         <item name="buttonBarNegativeButtonStyle">@style/DarkDialogButton</item>
         <item name="buttonBarNeutralButtonStyle">@style/DarkDialogButton</item>
     </style>
+
+    <!-- Calendar styles for dark theme -->
+    <style name="CalendarTheme" parent="ThemeOverlay.MaterialComponents">
+        <item name="colorAccent">@color/primary</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="android:textColorPrimary">@color/dashboard_text_primary</item>
+        <item name="android:textColorSecondary">@color/dashboard_text_secondary</item>
+        <item name="android:colorBackground">@color/dashboard_card_background</item>
+    </style>
+    
+    <style name="CalendarDateTextAppearance">
+        <item name="android:textColor">@color/dashboard_text_primary</item>
+        <item name="android:fontFamily">@font/dots_all_for_now_jl_family</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+    
+    <style name="CalendarWeekDayTextAppearance">
+        <item name="android:textColor">@color/dashboard_text_secondary</item>
+        <item name="android:fontFamily">@font/dots_all_for_now_jl_family</item>
+        <item name="android:textSize">12sp</item>
+    </style>
 </resources> 

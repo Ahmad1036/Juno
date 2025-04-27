@@ -165,16 +165,24 @@ public class AllChecklistsActivity extends AppCompatActivity implements AllCheck
         
         // Bulk action buttons
         markCompleteButton.setOnClickListener(v -> {
+            Log.d(TAG, "Mark complete button clicked");
             List<Task> selectedTasks = adapter.getSelectedTasks();
+            Log.d(TAG, "Selected tasks count: " + selectedTasks.size());
             if (!selectedTasks.isEmpty()) {
                 showMarkCompletionDialog(selectedTasks);
+            } else {
+                Toast.makeText(this, "No tasks selected", Toast.LENGTH_SHORT).show();
             }
         });
         
         deleteSelectedButton.setOnClickListener(v -> {
+            Log.d(TAG, "Delete selected button clicked");
             List<Task> selectedTasks = adapter.getSelectedTasks();
+            Log.d(TAG, "Selected tasks count: " + selectedTasks.size());
             if (!selectedTasks.isEmpty()) {
                 showDeleteConfirmationDialog(selectedTasks);
+            } else {
+                Toast.makeText(this, "No tasks selected", Toast.LENGTH_SHORT).show();
             }
         });
         
@@ -403,25 +411,50 @@ public class AllChecklistsActivity extends AppCompatActivity implements AllCheck
     
     private void batchUpdateTaskCompletion(List<Task> tasks, boolean markAsComplete) {
         if (tasks.isEmpty()) {
+            Log.d(TAG, "No tasks to update");
             return;
         }
         
-        // Counter for how many updates have completed
+        Log.d(TAG, "Starting batch update of " + tasks.size() + " tasks to " + (markAsComplete ? "complete" : "incomplete"));
+        
+        // Immediately update the tasks in local list for immediate UI feedback
+        for (Task task : tasks) {
+            // Only mark tasks that need to be changed
+            if (task.isCompleted() != markAsComplete) {
+                task.setCompleted(markAsComplete);
+                
+                // Find and update this task in allTasks
+                for (Task t : allTasks) {
+                    if (t.getId().equals(task.getId())) {
+                        t.setCompleted(markAsComplete);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Refresh adapter immediately so user sees changes
+        adapter.updateData(allTasks);
+        
+        // Counter for how many updates have completed in the background
         final int[] completedUpdates = {0};
         final int totalUpdates = tasks.size();
         
+        // Now update the database in the background
         for (Task task : tasks) {
-            // Only update if the status is different
-            if (task.isCompleted() != markAsComplete) {
-                task.setCompleted(markAsComplete);
+            // Only update if the status is different from original
+            if (task.isCompleted() == markAsComplete) {
+                Log.d(TAG, "Updating task: " + task.getId() + " to " + (markAsComplete ? "complete" : "incomplete"));
                 
                 mDatabase.child("users").child(userId).child("tasks").child(task.getId())
                         .child("completed").setValue(markAsComplete)
                         .addOnCompleteListener(task1 -> {
                             completedUpdates[0]++;
+                            Log.d(TAG, "Task updated: " + task.getId() + ", Progress: " + completedUpdates[0] + "/" + totalUpdates);
                             
                             // Check if all updates are done
                             if (completedUpdates[0] >= totalUpdates) {
+                                Log.d(TAG, "All tasks updated successfully");
                                 Toast.makeText(AllChecklistsActivity.this, 
                                         "Updated " + totalUpdates + " tasks", 
                                         Toast.LENGTH_SHORT).show();
@@ -433,25 +466,15 @@ public class AllChecklistsActivity extends AppCompatActivity implements AllCheck
                             }
                         })
                         .addOnFailureListener(e -> {
+                            Log.e(TAG, "Failed to update task: " + task.getId(), e);
                             Toast.makeText(AllChecklistsActivity.this,
                                     "Failed to update some tasks",
                                     Toast.LENGTH_SHORT).show();
-                            Log.e(TAG, "Failed to update task: " + task.getId(), e);
                         });
             } else {
                 // Count this as already completed
                 completedUpdates[0]++;
-            }
-        }
-        
-        // Handle case where all tasks were already in the desired state
-        if (completedUpdates[0] >= totalUpdates) {
-            Toast.makeText(this, 
-                    "Tasks were already " + (markAsComplete ? "complete" : "incomplete"), 
-                    Toast.LENGTH_SHORT).show();
-            
-            if (adapter.isInSelectionMode()) {
-                toggleSelectionMode(false);
+                Log.d(TAG, "Task already in desired state: " + task.getId() + ", Progress: " + completedUpdates[0] + "/" + totalUpdates);
             }
         }
     }
@@ -469,21 +492,38 @@ public class AllChecklistsActivity extends AppCompatActivity implements AllCheck
     
     private void batchDeleteTasks(List<Task> tasks) {
         if (tasks.isEmpty()) {
+            Log.d(TAG, "No tasks to delete");
             return;
         }
         
-        // Counter for how many deletes have completed
+        Log.d(TAG, "Starting batch delete of " + tasks.size() + " tasks");
+        
+        // Create a list of task IDs to be deleted for tracking
+        final List<String> taskIdsToDelete = new ArrayList<>();
+        for (Task task : tasks) {
+            taskIdsToDelete.add(task.getId());
+            Log.d(TAG, "Will delete task: " + task.getId() + " - " + task.getTitle());
+        }
+        
+        // Immediately remove tasks from local list for UI feedback
+        allTasks.removeIf(t -> taskIdsToDelete.contains(t.getId()));
+        adapter.updateData(allTasks);
+        
+        // Counter for how many deletes have completed in background
         final int[] completedDeletes = {0};
         final int totalDeletes = tasks.size();
         
+        // Now delete from database in background
         for (Task task : tasks) {
             mDatabase.child("users").child(userId).child("tasks").child(task.getId())
                     .removeValue()
                     .addOnCompleteListener(task1 -> {
                         completedDeletes[0]++;
+                        Log.d(TAG, "Task deleted: " + task.getId() + ", Progress: " + completedDeletes[0] + "/" + totalDeletes);
                         
                         // Check if all deletes are done
                         if (completedDeletes[0] >= totalDeletes) {
+                            Log.d(TAG, "All tasks deleted successfully");
                             Toast.makeText(AllChecklistsActivity.this, 
                                     "Deleted " + totalDeletes + " tasks", 
                                     Toast.LENGTH_SHORT).show();
@@ -495,10 +535,10 @@ public class AllChecklistsActivity extends AppCompatActivity implements AllCheck
                         }
                     })
                     .addOnFailureListener(e -> {
+                        Log.e(TAG, "Failed to delete task: " + task.getId(), e);
                         Toast.makeText(AllChecklistsActivity.this,
                                 "Failed to delete some tasks",
                                 Toast.LENGTH_SHORT).show();
-                        Log.e(TAG, "Failed to delete task: " + task.getId(), e);
                     });
         }
     }
@@ -537,16 +577,25 @@ public class AllChecklistsActivity extends AppCompatActivity implements AllCheck
     
     @Override
     public void onTaskSelected(int selectedCount) {
+        Log.d(TAG, "onTaskSelected called with count: " + selectedCount + ", selection mode: " + adapter.isInSelectionMode());
+        
         if (selectedCount > 0) {
             // Show bulk actions
             bulkActionsLayout.setVisibility(View.VISIBLE);
             selectedCountText.setText(selectedCount + " selected");
+            
+            // Make sure we're in selection mode if items are selected
+            if (!adapter.isInSelectionMode()) {
+                Log.d(TAG, "Forcing selection mode to true as items are selected");
+                adapter.toggleSelectionMode(true);
+            }
         } else {
             // Hide bulk actions if no tasks selected
             bulkActionsLayout.setVisibility(View.GONE);
             
             // Exit selection mode if count is 0
             if (adapter.isInSelectionMode()) {
+                Log.d(TAG, "Exiting selection mode as count is 0");
                 adapter.toggleSelectionMode(false);
             }
         }

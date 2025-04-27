@@ -25,6 +25,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
+import com.example.juno.model.Task;
+import com.example.juno.repository.TaskRepository;
+import com.example.juno.utils.NetworkManager;
+import com.example.juno.utils.ReminderManager;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,7 +43,9 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
-public class TaskDetailActivity extends AppCompatActivity {
+import java.util.List;
+
+public class TaskDetailActivity extends AppCompatActivity implements NetworkManager.NetworkChangeListener {
 
     private static final String TAG = "TaskDetailActivity";
     
@@ -54,6 +61,8 @@ public class TaskDetailActivity extends AppCompatActivity {
     private ProgressBar imageProgressBar;
     private Button editTaskButton;
     private Button deleteTaskButton;
+    private TextView offlineIndicator;
+    private ProgressBar loadingProgressBar;
     
     // Data
     private String taskId;
@@ -61,6 +70,10 @@ public class TaskDetailActivity extends AppCompatActivity {
     private Task currentTask;
     private DatabaseReference mDatabase;
     private StorageReference mStorageRef;
+    private TaskRepository taskRepository;
+    private NetworkManager networkManager;
+    private ReminderManager reminderManager;
+    private String selectedPriority = Task.PRIORITY_MEDIUM; // Default priority
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,8 +106,21 @@ public class TaskDetailActivity extends AppCompatActivity {
             return;
         }
         
+        // Initialize TaskRepository for offline support
+        taskRepository = new TaskRepository(this, userId);
+        
+        // Initialize NetworkManager
+        networkManager = new NetworkManager(this);
+        networkManager.setNetworkChangeListener(this);
+        
+        // Initialize the ReminderManager
+        reminderManager = new ReminderManager(this, userId);
+        
         initializeViews();
         setupClickListeners();
+        setupRepositoryObservers();
+        
+        // Use repository to load task
         loadTaskDetails();
     }
     
@@ -110,6 +136,45 @@ public class TaskDetailActivity extends AppCompatActivity {
         imageProgressBar = findViewById(R.id.image_progress_bar);
         editTaskButton = findViewById(R.id.edit_task_button);
         deleteTaskButton = findViewById(R.id.delete_task_button);
+        loadingProgressBar = findViewById(R.id.loading_progress_bar);
+        
+        // Create an offline indicator TextView
+        offlineIndicator = new TextView(this);
+        offlineIndicator.setText("Offline Mode - Changes will sync when online");
+        offlineIndicator.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+        offlineIndicator.setBackgroundColor(ContextCompat.getColor(this, R.color.primary_light));
+        offlineIndicator.setPadding(32, 16, 32, 16);
+        offlineIndicator.setVisibility(View.GONE);
+        
+        // Add to layout at the top
+        findViewById(android.R.id.content).post(() -> {
+            View root = findViewById(android.R.id.content);
+            if (root instanceof android.view.ViewGroup) {
+                ((android.view.ViewGroup) root).addView(offlineIndicator, 0);
+            }
+        });
+    }
+    
+    private void setupRepositoryObservers() {
+        // Observe tasks to find the current one
+        taskRepository.getTasksLiveData().observe(this, tasks -> {
+            if (tasks != null) {
+                for (Task task : tasks) {
+                    if (taskId.equals(task.getId())) {
+                        currentTask = task;
+                        displayTaskDetails();
+                        break;
+                    }
+                }
+            }
+        });
+        
+        // Observe error messages
+        taskRepository.getErrorMessage().observe(this, errorMsg -> {
+            if (errorMsg != null && !errorMsg.isEmpty()) {
+                Toast.makeText(this, errorMsg, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
     
     private void setupClickListeners() {
@@ -119,7 +184,13 @@ public class TaskDetailActivity extends AppCompatActivity {
             if (currentTask != null) {
                 boolean isChecked = completedCheckbox.isChecked();
                 currentTask.setCompleted(isChecked);
-                updateTaskCompletionStatus(isChecked);
+                
+                // Use repository to update task
+                taskRepository.updateTask(currentTask);
+                
+                // Show feedback
+                String message = isChecked ? "Task marked as complete" : "Task marked as incomplete";
+                Toast.makeText(TaskDetailActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
         
@@ -149,54 +220,45 @@ public class TaskDetailActivity extends AppCompatActivity {
     }
     
     private void deleteTask() {
-        mDatabase.child("users").child(userId).child("tasks").child(taskId).removeValue()
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(TaskDetailActivity.this, "Task deleted", Toast.LENGTH_SHORT).show();
-                    finish();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(TaskDetailActivity.this, "Failed to delete task", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Error deleting task", e);
-                });
-    }
-    
-    private void updateTaskCompletionStatus(boolean isCompleted) {
-        mDatabase.child("users").child(userId).child("tasks").child(taskId).child("completed")
-                .setValue(isCompleted)
-                .addOnSuccessListener(aVoid -> {
-                    String message = isCompleted ? "Task marked as complete" : "Task marked as incomplete";
-                    Toast.makeText(TaskDetailActivity.this, message, Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(TaskDetailActivity.this, "Failed to update task status", Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, "Error updating task status", e);
-                });
+        // Use repository to delete task
+        taskRepository.deleteTask(currentTask);
+        Toast.makeText(this, "Task deleted", Toast.LENGTH_SHORT).show();
+        finish();
     }
     
     private void loadTaskDetails() {
+        // Load tasks from repository, our observer will find the right one
+        taskRepository.loadTasks();
+        
+        // For backward compatibility, also try to load from Firebase directly
+        if (!networkManager.isNetworkAvailable()) {
+            // Show offline indicator
+            offlineIndicator.setVisibility(View.VISIBLE);
+            return;
+        }
+        
         mDatabase.child("users").child(userId).child("tasks").child(taskId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                currentTask = dataSnapshot.getValue(Task.class);
-                if (currentTask != null) {
-                    currentTask.setId(taskId);
+                Task task = dataSnapshot.getValue(Task.class);
+                if (task != null) {
+                    task.setId(taskId);
+                    currentTask = task;
                     displayTaskDetails();
-                } else {
-                    Toast.makeText(TaskDetailActivity.this, "Task not found", Toast.LENGTH_SHORT).show();
-                    finish();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.w(TAG, "loadTask:onCancelled", databaseError.toException());
-                Toast.makeText(TaskDetailActivity.this, "Failed to load task", Toast.LENGTH_SHORT).show();
-                finish();
+                // The repository should handle this case
             }
         });
     }
     
     private void displayTaskDetails() {
+        if (currentTask == null) return;
+        
         // Set title
         taskTitleView.setText(currentTask.getTitle());
         
@@ -223,14 +285,38 @@ public class TaskDetailActivity extends AppCompatActivity {
         completedCheckbox.setChecked(currentTask.isCompleted());
         
         // Set priority indicator
-        setPriorityIndicator(currentTask.getPriorityInt());
+        String priority = currentTask.getPriority();
+        if (priority != null && !priority.isEmpty()) {
+            if (priority.equalsIgnoreCase("high")) {
+                setPriorityIndicator(2);
+            } else if (priority.equalsIgnoreCase("medium")) {
+                setPriorityIndicator(1);
+            } else {
+                setPriorityIndicator(0);
+            }
+        }
         
         // Load task image if available
         loadTaskImage();
+        
+        // Show completed status visually
+        if (currentTask.isCompleted()) {
+            taskTitleView.setPaintFlags(taskTitleView.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+            taskTitleView.setAlpha(0.6f);
+            descriptionView.setPaintFlags(descriptionView.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+            descriptionView.setAlpha(0.6f);
+        } else {
+            taskTitleView.setPaintFlags(taskTitleView.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
+            taskTitleView.setAlpha(1.0f);
+            descriptionView.setPaintFlags(descriptionView.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
+            descriptionView.setAlpha(1.0f);
+        }
     }
     
     private void loadTaskImage() {
         // Check for image data (Base64 encoded string)
+        if (currentTask == null) return;
+        
         String imageData = currentTask.getImageData();
         
         // For backward compatibility, also check imageUrl if imageData isn't available
@@ -249,58 +335,36 @@ public class TaskDetailActivity extends AppCompatActivity {
                 // Display the decoded bitmap
                 taskImageView.setImageBitmap(decodedBitmap);
                 imageProgressBar.setVisibility(View.GONE);
-                Log.d(TAG, "Base64 image loaded successfully");
-                
-                // Set up image click for full-screen view
-                taskImageView.setOnClickListener(v -> {
-                    // You could launch a full-screen image viewer here
-                    Toast.makeText(TaskDetailActivity.this, "Opening image in full view", Toast.LENGTH_SHORT).show();
-                });
             } catch (Exception e) {
-                Log.e(TAG, "Failed to decode Base64 image: " + e.getMessage());
+                Log.e(TAG, "Failed to decode image data", e);
                 imageProgressBar.setVisibility(View.GONE);
                 taskImageCard.setVisibility(View.GONE);
-                Toast.makeText(TaskDetailActivity.this, "Failed to load image", Toast.LENGTH_SHORT).show();
             }
-        } 
-        // Fallback to imageUrl for backward compatibility
-        else if (imageUrl != null && !imageUrl.isEmpty()) {
-            // Show the image card and progress indicator
+        } else if (imageUrl != null && !imageUrl.isEmpty() && networkManager.isNetworkAvailable()) {
+            // If imageData isn't available but imageUrl is, and we're online,
+            // load it from Firebase Storage
             taskImageCard.setVisibility(View.VISIBLE);
             imageProgressBar.setVisibility(View.VISIBLE);
             
-            // Log the image URL for debugging
-            Log.d(TAG, "Falling back to image URL: " + imageUrl);
-            
-            // Load the image with Glide
+            // Use Glide to load the image
             Glide.with(this)
                 .load(imageUrl)
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        Log.e(TAG, "Failed to load image: " + e);
+                        Log.e(TAG, "Failed to load image from URL", e);
                         imageProgressBar.setVisibility(View.GONE);
                         taskImageCard.setVisibility(View.GONE);
-                        Toast.makeText(TaskDetailActivity.this, "Failed to load image", Toast.LENGTH_SHORT).show();
                         return false;
                     }
-
+                    
                     @Override
                     public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        Log.d(TAG, "Image URL loaded successfully");
                         imageProgressBar.setVisibility(View.GONE);
                         return false;
                     }
                 })
-                .placeholder(R.drawable.placeholder_image)
-                .error(R.drawable.error_image)
                 .into(taskImageView);
-            
-            // Set up image click for full-screen view
-            taskImageView.setOnClickListener(v -> {
-                // You could launch a full-screen image viewer here
-                Toast.makeText(TaskDetailActivity.this, "Opening image in full view", Toast.LENGTH_SHORT).show();
-            });
         } else {
             // No image available
             taskImageCard.setVisibility(View.GONE);
@@ -308,29 +372,126 @@ public class TaskDetailActivity extends AppCompatActivity {
     }
     
     private void setPriorityIndicator(int priority) {
-        int priorityDrawable;
-        
-        switch (priority) {
-            case 1: // High
-                priorityDrawable = R.drawable.priority_high_indicator;
-                break;
-            case 3: // Low
-                priorityDrawable = R.drawable.priority_low_indicator;
-                break;
-            default: // Medium (2) or any other value
-                priorityDrawable = R.drawable.priority_medium_indicator;
-                break;
+        if (priorityIndicator != null) {
+            int colorResId;
+            switch (priority) {
+                case 2: // High
+                    colorResId = R.color.high_priority;
+                    selectedPriority = Task.PRIORITY_HIGH;
+                    break;
+                case 1: // Medium
+                    colorResId = R.color.medium_priority;
+                    selectedPriority = Task.PRIORITY_MEDIUM;
+                    break;
+                case 0: // Low
+                default:
+                    colorResId = R.color.low_priority;
+                    selectedPriority = Task.PRIORITY_LOW;
+                    break;
+            }
+            
+            priorityIndicator.setBackgroundColor(ContextCompat.getColor(this, colorResId));
         }
-        
-        priorityIndicator.setBackgroundResource(priorityDrawable);
     }
     
     @Override
     protected void onResume() {
         super.onResume();
-        // Reload task details when returning to this activity (in case it was edited)
-        if (taskId != null && !taskId.isEmpty()) {
-            loadTaskDetails();
+        
+        // Check network status and show/hide offline indicator
+        updateOfflineIndicator();
+        
+        // Reload task details
+        loadTaskDetails();
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        
+        // Clean up network callbacks
+        if (networkManager != null) {
+            networkManager.unregisterNetworkCallbacks();
+        }
+    }
+    
+    @Override
+    public void onNetworkAvailable() {
+        // Network is available, sync any pending changes
+        updateOfflineIndicator();
+        taskRepository.syncIfNeeded();
+    }
+    
+    @Override
+    public void onNetworkUnavailable() {
+        // Network is gone - update UI
+        updateOfflineIndicator();
+    }
+    
+    private void updateOfflineIndicator() {
+        boolean isNetworkAvailable = networkManager.isNetworkAvailable();
+        
+        runOnUiThread(() -> {
+            if (isNetworkAvailable) {
+                offlineIndicator.setVisibility(View.GONE);
+            } else {
+                offlineIndicator.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void saveTask() {
+        // Get task data from UI
+        String title = taskTitleView.getText().toString().trim();
+        String description = descriptionView.getText().toString().trim();
+        
+        // Validate title
+        if (title.isEmpty()) {
+            taskTitleView.setError("Task title is required");
+            return;
+        }
+        
+        // Update task object with UI data
+        currentTask.setTitle(title);
+        currentTask.setDescription(description);
+        currentTask.setDueDate(System.currentTimeMillis());
+        currentTask.setPriority(selectedPriority);
+        
+        // Show loading
+        showLoading(true);
+        
+        // Save task
+        taskRepository.saveTask(currentTask, new TaskRepository.TaskCallback() {
+            @Override
+            public void onTaskSaved(Task task) {
+                runOnUiThread(() -> {
+                    showLoading(false);
+                    
+                    // Schedule reminder for the saved task
+                    reminderManager.scheduleReminder(task);
+                    
+                    Toast.makeText(TaskDetailActivity.this, "Task saved", Toast.LENGTH_SHORT).show();
+                    finish();
+                });
+            }
+            
+            @Override
+            public void onError(Exception e) {
+                runOnUiThread(() -> {
+                    showLoading(false);
+                    Toast.makeText(TaskDetailActivity.this, "Error saving task: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+
+    /**
+     * Show or hide loading indicator
+     */
+    private void showLoading(boolean show) {
+        if (loadingProgressBar != null) {
+            loadingProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }
 } 

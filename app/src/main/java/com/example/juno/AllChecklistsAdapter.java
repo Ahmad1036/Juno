@@ -2,6 +2,7 @@ package com.example.juno;
 
 import android.content.Context;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -145,8 +146,20 @@ public class AllChecklistsAdapter extends RecyclerView.Adapter<AllChecklistsAdap
         
         // Set selection state
         boolean isSelected = selectedTaskIds.contains(task.getId());
+        Log.d("AllChecklistsAdapter", "Setting selection state for task " + task.getId() + ": " + isSelected + " (selection mode: " + isSelectionMode + ")");
+        
+        // Update selection visuals
         holder.itemView.setActivated(isSelected);
         holder.selectionIndicator.setVisibility(isSelected ? View.VISIBLE : View.INVISIBLE);
+        
+        // In selection mode, make sure the selection indicator has a stronger visual cue
+        if (isSelectionMode) {
+            holder.itemView.setBackgroundColor(isSelected ? 
+                ContextCompat.getColor(context, R.color.colorPrimaryDark) : 
+                ContextCompat.getColor(context, android.R.color.transparent));
+        } else {
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, android.R.color.transparent));
+        }
     }
 
     @Override
@@ -156,9 +169,13 @@ public class AllChecklistsAdapter extends RecyclerView.Adapter<AllChecklistsAdap
     
     // Method to toggle selection mode
     public void toggleSelectionMode(boolean enabled) {
+        Log.d("AllChecklistsAdapter", "Toggle selection mode: " + enabled + ", current mode: " + isSelectionMode);
+        
         if (!enabled) {
+            Log.d("AllChecklistsAdapter", "Clearing selection. Current selected count: " + selectedTaskIds.size());
             selectedTaskIds.clear();
         }
+        
         this.isSelectionMode = enabled;
         notifyDataSetChanged();
         
@@ -203,11 +220,16 @@ public class AllChecklistsAdapter extends RecyclerView.Adapter<AllChecklistsAdap
     // Method to get the selected tasks
     public List<Task> getSelectedTasks() {
         List<Task> selectedTasks = new ArrayList<>();
+        Log.d("AllChecklistsAdapter", "Getting selected tasks. Selection mode: " + isSelectionMode + ", Selected IDs: " + selectedTaskIds.size());
+        
         for (Task task : filteredList) {
             if (selectedTaskIds.contains(task.getId())) {
                 selectedTasks.add(task);
+                Log.d("AllChecklistsAdapter", "Added selected task: " + task.getId() + " - " + task.getTitle());
             }
         }
+        
+        Log.d("AllChecklistsAdapter", "Total selected tasks: " + selectedTasks.size());
         return selectedTasks;
     }
     
@@ -281,11 +303,16 @@ public class AllChecklistsAdapter extends RecyclerView.Adapter<AllChecklistsAdap
                     
                     if (isSelectionMode) {
                         // Toggle selection
-                        if (selectedTaskIds.contains(task.getId())) {
+                        boolean wasSelected = selectedTaskIds.contains(task.getId());
+                        Log.d("AllChecklistsAdapter", "Task click in selection mode - ID: " + task.getId() + ", was selected: " + wasSelected);
+                        
+                        if (wasSelected) {
                             selectedTaskIds.remove(task.getId());
                         } else {
                             selectedTaskIds.add(task.getId());
                         }
+                        
+                        Log.d("AllChecklistsAdapter", "After toggle - Selected count: " + selectedTaskIds.size());
                         notifyItemChanged(position);
                         
                         if (listener != null) {
@@ -293,6 +320,7 @@ public class AllChecklistsAdapter extends RecyclerView.Adapter<AllChecklistsAdap
                         }
                     } else if (listener != null) {
                         // Normal click
+                        Log.d("AllChecklistsAdapter", "Normal task click - ID: " + task.getId());
                         listener.onTaskClick(task, position);
                     }
                 }
@@ -303,8 +331,12 @@ public class AllChecklistsAdapter extends RecyclerView.Adapter<AllChecklistsAdap
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && !isSelectionMode) {
                     Task task = filteredList.get(position);
+                    Log.d("AllChecklistsAdapter", "Long press - entering selection mode for task: " + task.getId());
+                    
                     isSelectionMode = true;
                     selectedTaskIds.add(task.getId());
+                    Log.d("AllChecklistsAdapter", "Added to selection - count: " + selectedTaskIds.size());
+                    
                     notifyDataSetChanged();
                     
                     if (listener != null) {

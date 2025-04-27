@@ -4,9 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="?attr/colorSurface"
     tools:context=".SettingsActivity">
 
+    <!-- Top Bar -->
     <LinearLayout
         android:id="@+id/header_layout"
         android:layout_width="match_parent"
@@ -14,23 +15,23 @@
         android:orientation="horizontal"
         android:padding="16dp">
 
-        <ImageButton
-            android:id="@+id/back_button"
+        <ImageView
+            android:id="@+id/backButton"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Back"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:tint="#FFFFFF" />
+            android:src="@drawable/ic_back"
+            android:tint="?attr/colorOnSurface"
+            android:contentDescription="Back" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="16dp"
-            android:layout_weight="1"
             android:text="Settings"
-            android:textColor="#FFFFFF"
+            android:textColor="?attr/colorOnSurface"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
             android:textSize="20sp" />
     </LinearLayout>
 
@@ -47,136 +48,193 @@
             android:paddingHorizontal="16dp"
             android:paddingBottom="24dp">
 
-            <!-- Account Section -->
+            <!-- Appearance Section -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
-                android:text="Account"
-                android:textColor="#AAAAAA"
-                android:textSize="14sp" />
+                android:text="Appearance"
+                android:textColor="?attr/colorAccent"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
+            <!-- Dark Mode -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#1A1A1A"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant"
                 app:cardCornerRadius="8dp"
-                app:cardElevation="0dp">
+                app:cardElevation="0dp"
+                android:layout_marginBottom="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="horizontal"
+                    android:padding="16dp">
 
-                    <TextView
-                        android:id="@+id/user_email_text"
-                        android:layout_width="match_parent"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:padding="16dp"
-                        android:text="user@example.com"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp" />
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#333333" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Dark mode"
+                            android:textColor="?attr/colorOnSurface"
+                            android:fontFamily="@font/dots_all_for_now_jl_family"
+                            android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/edit_profile_button"
-                        android:layout_width="match_parent"
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Use dark theme throughout the app"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:fontFamily="@font/dots_all_for_now_jl_family"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <Switch
+                        android:id="@+id/darkModeSwitch"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="16dp"
-                        android:text="Edit Profile"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#333333" />
-
-                    <TextView
-                        android:id="@+id/change_password_button"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="16dp"
-                        android:text="Change Password"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#333333" />
-
-                    <TextView
-                        android:id="@+id/logout_button"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="16dp"
-                        android:text="Logout"
-                        android:textColor="#F44336"
-                        android:textSize="16sp" />
+                        android:layout_gravity="center_vertical" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Appearance Section -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp"
-                android:text="Appearance"
-                android:textColor="#AAAAAA"
-                android:textSize="14sp" />
-
+            <!-- Font Size -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#1A1A1A"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant"
                 app:cardCornerRadius="8dp"
-                app:cardElevation="0dp">
+                app:cardElevation="0dp"
+                android:layout_marginBottom="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-                    <LinearLayout
-                        android:id="@+id/dark_mode_setting"
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
+                        android:text="Font size"
+                        android:textColor="?attr/colorOnSurface"
+                        android:fontFamily="@font/dots_all_for_now_jl_family"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Adjust the text size throughout the app"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:fontFamily="@font/dots_all_for_now_jl_family"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="8dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:padding="16dp">
+                        android:gravity="center_vertical">
 
                         <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="A"
+                            android:textSize="14sp"
+                            android:textColor="?attr/colorOnSurface"
+                            android:fontFamily="@font/dots_all_for_now_jl_family" />
+
+                        <SeekBar
+                            android:id="@+id/fontSizeSeekBar"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Dark Mode"
-                            android:textColor="#FFFFFF"
-                            android:textSize="16sp" />
+                            android:max="12"
+                            android:progress="4" />
 
-                        <Switch
-                            android:id="@+id/dark_mode_switch"
+                        <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="true" />
+                            android:text="A"
+                            android:textSize="20sp"
+                            android:textColor="?attr/colorOnSurface"
+                            android:fontFamily="@font/dots_all_for_now_jl_family" />
+
+                        <TextView
+                            android:id="@+id/fontSizeValueText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="16 sp"
+                            android:textColor="?attr/colorOnSurface"
+                            android:fontFamily="@font/dots_all_for_now_jl_family"
+                            android:layout_marginStart="16dp" />
                     </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Layout Style -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Layout density"
+                        android:textColor="?attr/colorOnSurface"
+                        android:fontFamily="@font/dots_all_for_now_jl_family"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Choose how densely content is displayed"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:fontFamily="@font/dots_all_for_now_jl_family"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="8dp" />
+
+                    <RadioGroup
+                        android:id="@+id/layoutStyleGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <RadioButton
+                            android:id="@+id/compactLayoutRadio"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Compact"
+                            android:textColor="?attr/colorOnSurface"
+                            android:fontFamily="@font/dots_all_for_now_jl_family" />
+
+                        <RadioButton
+                            android:id="@+id/comfortableLayoutRadio"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Comfortable"
+                            android:checked="true"
+                            android:textColor="?attr/colorOnSurface"
+                            android:fontFamily="@font/dots_all_for_now_jl_family" />
+                    </RadioGroup>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -184,48 +242,167 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
                 android:text="Notifications"
-                android:textColor="#AAAAAA"
-                android:textSize="14sp" />
+                android:textColor="?attr/colorAccent"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
+            <!-- Enable Notifications -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#1A1A1A"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant"
                 app:cardCornerRadius="8dp"
-                app:cardElevation="0dp">
+                app:cardElevation="0dp"
+                android:layout_marginBottom="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="horizontal"
+                    android:padding="16dp">
 
                     <LinearLayout
-                        android:id="@+id/notifications_setting"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:orientation="horizontal"
-                        android:padding="16dp">
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
                         <TextView
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="Task Reminders"
-                            android:textColor="#FFFFFF"
+                            android:text="Notifications"
+                            android:textColor="?attr/colorOnSurface"
+                            android:fontFamily="@font/dots_all_for_now_jl_family"
                             android:textSize="16sp" />
 
-                        <Switch
-                            android:id="@+id/notifications_switch"
-                            android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:checked="true" />
+                            android:text="Enable task reminders"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:fontFamily="@font/dots_all_for_now_jl_family"
+                            android:textSize="14sp" />
                     </LinearLayout>
+
+                    <Switch
+                        android:id="@+id/notificationsEnabledSwitch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Notification Style -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Notification style"
+                        android:textColor="?attr/colorOnSurface"
+                        android:fontFamily="@font/dots_all_for_now_jl_family"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Choose how notifications are displayed"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:fontFamily="@font/dots_all_for_now_jl_family"
+                        android:textSize="14sp"
+                        android:layout_marginBottom="8dp" />
+
+                    <Spinner
+                        android:id="@+id/notificationStyleSpinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="?attr/colorOnSurface"
+                        android:minHeight="48dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Application Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="Application"
+                android:textColor="?attr/colorAccent"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- Account Section -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/accountCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                android:layout_marginBottom="24dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/accountEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="user@example.com"
+                        android:textColor="?attr/colorOnSurface"
+                        android:fontFamily="@font/dots_all_for_now_jl_family"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/edit_profile_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Edit Profile"
+                        android:textColor="?attr/colorPrimary"
+                        android:fontFamily="@font/dots_all_for_now_jl_family"
+                        android:textSize="16sp"
+                        android:padding="8dp"
+                        android:layout_marginTop="8dp" />
+
+                    <TextView
+                        android:id="@+id/change_password_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Change Password"
+                        android:textColor="?attr/colorPrimary"
+                        android:fontFamily="@font/dots_all_for_now_jl_family"
+                        android:textSize="16sp"
+                        android:padding="8dp" />
+
+                    <Button
+                        android:id="@+id/logoutButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Log out"
+                        android:textColor="?attr/colorError"
+                        android:backgroundTint="@android:color/transparent"
+                        android:layout_marginTop="8dp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -233,68 +410,108 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="8dp"
                 android:text="About"
-                android:textColor="#AAAAAA"
-                android:textSize="14sp" />
+                android:textColor="?attr/colorAccent"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
 
+            <!-- About App Card -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="#1A1A1A"
+                app:cardBackgroundColor="?attr/colorSurfaceVariant"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/appVersionTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Version 1.0.0"
+                        android:textColor="?attr/colorOnSurface"
+                        android:fontFamily="@font/dots_all_for_now_jl_family"
+                        android:textSize="16sp"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/privacyPolicyTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Privacy Policy"
+                        android:textColor="?attr/colorPrimary"
+                        android:fontFamily="@font/dots_all_for_now_jl_family"
+                        android:textSize="16sp"
+                        android:padding="8dp" />
+
+                    <TextView
+                        android:id="@+id/termsOfServiceTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Terms of Service"
+                        android:textColor="?attr/colorPrimary"
+                        android:fontFamily="@font/dots_all_for_now_jl_family"
+                        android:textSize="16sp"
+                        android:padding="8dp" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Smart Reminders & Nudges -->
+            <LinearLayout
+                android:id="@+id/smart_reminders_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/version_info"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16dp"
-                        android:text="Version 1.0.0"
+                        android:text="Smart Reminders &amp; Nudges"
                         android:textColor="#FFFFFF"
+                        android:fontFamily="@font/dots_all_for_now_jl_family"
                         android:textSize="16sp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#333333" />
 
                     <TextView
-                        android:id="@+id/privacy_policy_button"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="16dp"
-                        android:text="Privacy Policy"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp" />
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#333333" />
-
-                    <TextView
-                        android:id="@+id/terms_of_service_button"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="16dp"
-                        android:text="Terms of Service"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp" />
+                        android:layout_marginTop="4dp"
+                        android:text="Configure gentle notifications ahead of deadlines"
+                        android:textColor="#AAAAAA"
+                        android:fontFamily="@font/dots_all_for_now_jl_family"
+                        android:textSize="14sp" />
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/checklist"
+                    android:tint="#AAAAAA"
+                    android:contentDescription="Smart Reminders" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#333333"
+                android:alpha="0.5" />
         </LinearLayout>
     </ScrollView>
 </RelativeLayout> 

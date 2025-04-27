@@ -35,6 +35,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.juno.model.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -65,8 +66,7 @@ public class CreateTaskActivity extends AppCompatActivity {
 
     // UI Elements
     private ImageView backButton;
-    private Spinner taskListSpinner;
-    private ImageButton addListButton;
+    private EditText taskTitleEditText;
     private EditText taskDescriptionEditText;
     private ImageButton voiceInputButton;
     private ImageButton cameraInputButton;
@@ -81,13 +81,13 @@ public class CreateTaskActivity extends AppCompatActivity {
     private LinearLayout lowPriorityButton;
     private LinearLayout mediumPriorityButton;
     private LinearLayout highPriorityButton;
+    private Spinner labelSpinner;
     private ImageButton cancelButton;
     private ImageButton saveTaskButton;
 
     // Data
-    private List<String> taskLists = new ArrayList<>();
-    private String selectedTaskList;
     private String taskPriority = "medium"; // Default priority
+    private String taskLabel = ""; // Task label/category
     private Calendar selectedDateTime;
     private Uri selectedImageUri;
     private Bitmap capturedImageBitmap;
@@ -95,6 +95,7 @@ public class CreateTaskActivity extends AppCompatActivity {
     private StorageReference mStorageRef;
     private String userId;
     private boolean isTaskCompleted = false;
+    private boolean isTitleGenerated = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,9 +135,6 @@ public class CreateTaskActivity extends AppCompatActivity {
             }
         }
         
-        // Set up task lists spinner
-        fetchTaskLists();
-        
         // Initialize date and time
         selectedDateTime = Calendar.getInstance();
         updateDateText();
@@ -150,8 +148,7 @@ public class CreateTaskActivity extends AppCompatActivity {
 
     private void initializeViews() {
         backButton = findViewById(R.id.backButton);
-        taskListSpinner = findViewById(R.id.taskListSpinner);
-        addListButton = findViewById(R.id.addListButton);
+        taskTitleEditText = findViewById(R.id.taskTitleEditText);
         taskDescriptionEditText = findViewById(R.id.taskDescriptionEditText);
         voiceInputButton = findViewById(R.id.voiceInputButton);
         cameraInputButton = findViewById(R.id.cameraInputButton);
@@ -166,16 +163,17 @@ public class CreateTaskActivity extends AppCompatActivity {
         lowPriorityButton = findViewById(R.id.lowPriorityButton);
         mediumPriorityButton = findViewById(R.id.mediumPriorityButton);
         highPriorityButton = findViewById(R.id.highPriorityButton);
+        labelSpinner = findViewById(R.id.labelSpinner);
         cancelButton = findViewById(R.id.cancelButton);
         saveTaskButton = findViewById(R.id.saveTaskButton);
+        
+        // Set up label spinner
+        setupLabelSpinner();
     }
 
     private void setupClickListeners() {
         // Back button
         backButton.setOnClickListener(v -> onBackPressed());
-        
-        // Add new list button
-        addListButton.setOnClickListener(v -> showAddListDialog());
         
         // Voice input button
         voiceInputButton.setOnClickListener(v -> startVoiceInput());
@@ -211,9 +209,9 @@ public class CreateTaskActivity extends AppCompatActivity {
     private void setupAnimations() {
         // Fade in animations for all views
         View[] views = {
-            backButton, taskListSpinner, addListButton, taskDescriptionEditText,
-            voiceInputButton, cameraInputButton, datePickerLayout, timePickerLayout,
-            lowPriorityButton, mediumPriorityButton, highPriorityButton,
+            backButton, taskTitleEditText,
+            taskDescriptionEditText, voiceInputButton, cameraInputButton, datePickerLayout,
+            timePickerLayout, lowPriorityButton, mediumPriorityButton, highPriorityButton,
             cancelButton, saveTaskButton
         };
         
@@ -225,228 +223,6 @@ public class CreateTaskActivity extends AppCompatActivity {
                     .setStartDelay(50 + (i * 50))
                     .start();
         }
-    }
-
-    private void fetchTaskLists() {
-        // Add default list
-        taskLists.add("Personal Tasks");
-        
-        // Fetch from Firebase
-        mDatabase.child("users").child(userId).child("task_lists")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot listSnapshot : dataSnapshot.getChildren()) {
-                        String listName = listSnapshot.getValue(String.class);
-                        if (listName != null && !taskLists.contains(listName)) {
-                            taskLists.add(listName);
-                        }
-                    }
-                }
-                
-                // Set up spinner after fetching
-                setupTaskListSpinner();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e(TAG, "Error fetching task lists", databaseError.toException());
-                // Still set up spinner with default lists
-                setupTaskListSpinner();
-            }
-        });
-    }
-
-    private void setupTaskListSpinner() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_item, taskLists);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        taskListSpinner.setAdapter(adapter);
-        
-        // If editing, try to select the correct task list
-        boolean isEditing = getIntent().getBooleanExtra("isEditing", false);
-        if (isEditing && selectedTaskList != null) {
-            int position = taskLists.indexOf(selectedTaskList);
-            if (position >= 0) {
-                taskListSpinner.setSelection(position);
-            }
-        }
-        
-        taskListSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedTaskList = taskLists.get(position);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                selectedTaskList = taskLists.get(0);
-            }
-        });
-    }
-
-    private void showAddListDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Create New List");
-        
-        final EditText input = new EditText(this);
-        input.setHint("List name");
-        builder.setView(input);
-        
-        builder.setPositiveButton("Create", (dialog, which) -> {
-            String listName = input.getText().toString().trim();
-            if (!listName.isEmpty()) {
-                // Add to local list and update spinner
-                taskLists.add(listName);
-                setupTaskListSpinner();
-                taskListSpinner.setSelection(taskLists.size() - 1);
-                
-                // Save to Firebase
-                mDatabase.child("users").child(userId).child("task_lists")
-                        .child(String.valueOf(taskLists.size() - 1))
-                        .setValue(listName);
-            }
-        });
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-        
-        builder.show();
-    }
-
-    private void startVoiceInput() {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak your task...");
-        
-        try {
-            startActivityForResult(intent, REQUEST_VOICE_INPUT);
-        } catch (Exception e) {
-            Toast.makeText(this, "Voice input not supported on this device", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void showImageSourceDialog() {
-        String[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
-        
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add Image");
-        builder.setItems(options, (dialog, which) -> {
-            if (which == 0) {
-                // Take photo
-                checkCameraPermissionAndOpenCamera();
-            } else if (which == 1) {
-                // Choose from gallery
-                openGallery();
-            } else {
-                dialog.dismiss();
-            }
-        });
-        builder.show();
-    }
-
-    private void checkCameraPermissionAndOpenCamera() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) 
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, 
-                    new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
-        } else {
-            openCamera();
-        }
-    }
-
-    private void openCamera() {
-        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (cameraIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(cameraIntent, REQUEST_CAMERA_IMAGE);
-        } else {
-            Toast.makeText(this, "No camera app found", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void openGallery() {
-        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        galleryIntent.setType("image/*");
-        startActivityForResult(galleryIntent, REQUEST_GALLERY_IMAGE);
-    }
-
-    private void processImage(Bitmap bitmap) {
-        // Set image preview
-        taskImagePreview.setImageBitmap(bitmap);
-        imagePreviewCard.setVisibility(View.VISIBLE);
-        
-        // Simple placeholder for ML Kit object detection
-        // In a real app, you would integrate ML Kit here
-        detectedObjectsText.setText("Detected: Task-related objects");
-    }
-
-    private void showDatePicker() {
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
-                this,
-                (view, year, month, dayOfMonth) -> {
-                    selectedDateTime.set(Calendar.YEAR, year);
-                    selectedDateTime.set(Calendar.MONTH, month);
-                    selectedDateTime.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                    updateDateText();
-                },
-                selectedDateTime.get(Calendar.YEAR),
-                selectedDateTime.get(Calendar.MONTH),
-                selectedDateTime.get(Calendar.DAY_OF_MONTH)
-        );
-        datePickerDialog.show();
-    }
-
-    private void updateDateText() {
-        // Format date based on whether it's today, tomorrow, or a future date
-        Calendar today = Calendar.getInstance();
-        Calendar tomorrow = Calendar.getInstance();
-        tomorrow.add(Calendar.DAY_OF_YEAR, 1);
-        
-        if (isSameDay(selectedDateTime, today)) {
-            dateTextView.setText("Today");
-        } else if (isSameDay(selectedDateTime, tomorrow)) {
-            dateTextView.setText("Tomorrow");
-        } else {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMM d", Locale.getDefault());
-            dateTextView.setText(dateFormat.format(selectedDateTime.getTime()));
-        }
-    }
-
-    private boolean isSameDay(Calendar cal1, Calendar cal2) {
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
-    }
-
-    private void showTimePicker() {
-        TimePickerDialog timePickerDialog = new TimePickerDialog(
-                this,
-                (view, hourOfDay, minute) -> {
-                    selectedDateTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                    selectedDateTime.set(Calendar.MINUTE, minute);
-                    updateTimeText();
-                },
-                selectedDateTime.get(Calendar.HOUR_OF_DAY),
-                selectedDateTime.get(Calendar.MINUTE),
-                false
-        );
-        timePickerDialog.show();
-    }
-
-    private void updateTimeText() {
-        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.getDefault());
-        timeTextView.setText(timeFormat.format(selectedDateTime.getTime()));
-    }
-
-    private void setPriority(String priority) {
-        taskPriority = priority;
-        
-        // Update UI to reflect selected priority
-        lowPriorityButton.setBackgroundResource(priority.equals("low") ? 
-                R.color.priority_low : R.drawable.priority_button_background);
-        mediumPriorityButton.setBackgroundResource(priority.equals("medium") ? 
-                R.color.priority_medium : R.drawable.priority_button_background);
-        highPriorityButton.setBackgroundResource(priority.equals("high") ? 
-                R.color.priority_high : R.drawable.priority_button_background);
     }
 
     private void loadTaskForEditing(String taskId) {
@@ -478,44 +254,56 @@ public class CreateTaskActivity extends AppCompatActivity {
     }
 
     private void fillTaskDataInUI(Task task) {
-        // Set description
-        if (task.getDescription() != null) {
-            taskDescriptionEditText.setText(task.getDescription());
+        // Set title and description
+        if (taskTitleEditText != null) {
+            taskTitleEditText.setText(task.getTitle());
         }
         
-        // Set task list (spinner selection)
-        if (task.getTitle() != null) {
-            selectedTaskList = task.getTitle();
-            // Spinner selection will be handled after task lists are fetched
-        }
+        taskDescriptionEditText.setText(task.getDescription());
         
-        // Set due date if available
+        // Set date and time
         if (task.getDueDate() > 0) {
             selectedDateTime.setTimeInMillis(task.getDueDate());
             updateDateText();
-            updateTimeText();
+            
+            if (task.getTime() != null && !task.getTime().isEmpty()) {
+                timeTextView.setText(task.getTime());
+            } else {
+                updateTimeText();
+            }
         }
         
         // Set priority
-        if (task.getPriority() != null) {
-            setPriority(task.getPriority());
+        setPriority(task.getPriority().toLowerCase());
+        
+        // Set label if present
+        if (task.getLabel() != null && !task.getLabel().isEmpty()) {
+            ArrayAdapter<String> adapter = (ArrayAdapter<String>) labelSpinner.getAdapter();
+            for (int i = 0; i < adapter.getCount(); i++) {
+                if (adapter.getItem(i).equalsIgnoreCase(task.getLabel())) {
+                    labelSpinner.setSelection(i);
+                    break;
+                }
+            }
         }
         
-        // Store completion status in a class variable to preserve it when updating
+        // Set completion status
         isTaskCompleted = task.isCompleted();
         
-        // Set image if available
+        // Load image if present
         if (task.getImageData() != null && !task.getImageData().isEmpty()) {
             try {
                 byte[] decodedString = Base64.decode(task.getImageData(), Base64.DEFAULT);
                 capturedImageBitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                processImage(capturedImageBitmap);
+                taskImagePreview.setImageBitmap(capturedImageBitmap);
+                imagePreviewCard.setVisibility(View.VISIBLE);
             } catch (Exception e) {
-                Log.e(TAG, "Error loading image data", e);
+                Log.e(TAG, "Error decoding image: " + e.getMessage());
             }
+        } else if (task.getImageUrl() != null && !task.getImageUrl().isEmpty()) {
+            // If there's an image URL but no image data, we could load it from Firebase Storage
+            // For simplicity, I'm skipping this here, but you'd use Glide or similar to load the image
         }
-        
-        // No need to update save button text, it's an icon now
     }
 
     // Helper method to show progress bar
@@ -526,41 +314,63 @@ public class CreateTaskActivity extends AppCompatActivity {
     }
 
     private void saveTask() {
-        String taskDescription = taskDescriptionEditText.getText().toString().trim();
+        String description = taskDescriptionEditText.getText().toString().trim();
+        String title = taskTitleEditText != null ? taskTitleEditText.getText().toString().trim() : "";
         
-        if (taskDescription.isEmpty()) {
+        if (description.isEmpty()) {
             Toast.makeText(this, "Please enter a task description", Toast.LENGTH_SHORT).show();
             return;
         }
         
-        // Show loading state by disabling button
-        saveTaskButton.setEnabled(false);
+        if (title.isEmpty() && "Auto".equalsIgnoreCase(taskLabel)) {
+            // If we have the "Auto" label but no title yet, generate one
+            Toast.makeText(this, "Generating title from description...", Toast.LENGTH_SHORT).show();
+            showProgressBar(true);
+            
+            // Use final variables for lambda to avoid "effectively final" errors
+            final String finalDescription = description;
+            
+            GeminiTaskTitleGenerator.generateTitleAsync(description, generatedTitle -> {
+                runOnUiThread(() -> {
+                    // Use the generated title with the saved description
+                    continueTaskSaving(generatedTitle, finalDescription);
+                });
+            });
+        } else {
+            // If title is present or we're not using Auto label, continue with saving
+            continueTaskSaving(title, description);
+        }
+    }
+    
+    private void continueTaskSaving(String title, String description) {
+        showProgressBar(true);
         
-        // Create task data using the Task class field names
-        final Map<String, Object> taskData = new HashMap<>();
-        taskData.put("title", selectedTaskList); // Use list name as title
-        taskData.put("description", taskDescription);
-        
-        // Check if we're in edit mode to preserve completion status
         boolean isEditing = getIntent().getBooleanExtra("isEditing", false);
         String taskId = getIntent().getStringExtra("taskId");
         
-        // Use the stored completion status for editing, or default to false for new tasks
-        taskData.put("completed", isEditing ? isTaskCompleted : false);
-        
-        taskData.put("dueDate", selectedDateTime.getTimeInMillis());
-        if (!isEditing) {
-            // Only set createdAt for new tasks
-            taskData.put("createdAt", System.currentTimeMillis());
+        if (taskId == null || taskId.isEmpty()) {
+            taskId = mDatabase.child("users").child(userId).child("tasks").push().getKey();
         }
-        taskData.put("priority", taskPriority);
         
-        // If there's an image, encode it as Base64 and add to task data
-        if (selectedImageUri != null || capturedImageBitmap != null) {
-            encodeImageAndSaveTask(taskData, isEditing, taskId);
+        final String finalTaskId = taskId;
+        
+        // Prepare task data
+        Map<String, Object> taskData = new HashMap<>();
+        taskData.put("id", taskId);
+        taskData.put("title", title);
+        taskData.put("description", description);
+        taskData.put("dueDate", selectedDateTime.getTimeInMillis());
+        taskData.put("time", timeTextView.getText().toString());
+        taskData.put("priority", taskPriority);
+        taskData.put("completed", isTaskCompleted);
+        taskData.put("userId", userId);
+        taskData.put("label", taskLabel); // Save the label
+        
+        // If we have an image, we need to encode it before saving
+        if (capturedImageBitmap != null || selectedImageUri != null) {
+            encodeImageAndSaveTask(taskData, isEditing, finalTaskId);
         } else {
-            // No image, just save the task
-            saveTaskToDatabase(taskData, isEditing, taskId);
+            saveTaskToDatabase(taskData, isEditing, finalTaskId);
         }
     }
 
@@ -657,6 +467,221 @@ public class CreateTaskActivity extends AppCompatActivity {
             Toast.makeText(this, "Failed to create task ID", Toast.LENGTH_SHORT).show();
             saveTaskButton.setEnabled(true);
         }
+    }
+
+    private void setupLabelSpinner() {
+        List<String> labels = new ArrayList<>();
+        labels.add("None"); // Default option
+        labels.add("Auto"); // Special option for auto-generated titles
+        labels.add("Work");
+        labels.add("Personal");
+        labels.add("Shopping");
+        labels.add("Health");
+        labels.add("Education");
+        
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_item, labels);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        labelSpinner.setAdapter(adapter);
+        
+        labelSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+                    taskLabel = ""; // No label
+                } else {
+                    taskLabel = parent.getItemAtPosition(position).toString();
+                    
+                    // If "Auto" is selected and we have a description, offer to generate a title
+                    if ("Auto".equalsIgnoreCase(taskLabel) && 
+                        taskDescriptionEditText.getText().length() > 0 &&
+                        !isTitleGenerated) {
+                        showGenerateTitleDialog();
+                    }
+                }
+            }
+            
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                taskLabel = "";
+            }
+        });
+    }
+    
+    private void showGenerateTitleDialog() {
+        if (taskDescriptionEditText.getText().length() == 0) {
+            Toast.makeText(this, "Please enter a task description first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Generate Title");
+        builder.setMessage("Would you like to generate a title based on your task description?");
+        builder.setPositiveButton("Generate", (dialog, which) -> {
+            generateTaskTitle();
+        });
+        builder.setNegativeButton("No, Thanks", null);
+        builder.show();
+    }
+    
+    private void generateTaskTitle() {
+        String description = taskDescriptionEditText.getText().toString().trim();
+        
+        if (description.isEmpty()) {
+            Toast.makeText(this, "Please enter a task description first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        Toast.makeText(this, "Generating title...", Toast.LENGTH_SHORT).show();
+        
+        // Show loading indicator if needed
+        showProgressBar(true);
+        
+        GeminiTaskTitleGenerator.generateTitleAsync(description, title -> {
+            // Run on UI thread since the callback may come from a background thread
+            runOnUiThread(() -> {
+                taskTitleEditText.setText(title);
+                isTitleGenerated = true;
+                showProgressBar(false);
+                Toast.makeText(CreateTaskActivity.this, "Title generated!", Toast.LENGTH_SHORT).show();
+            });
+        });
+    }
+
+    private void showDatePicker() {
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, year, month, dayOfMonth) -> {
+                    selectedDateTime.set(Calendar.YEAR, year);
+                    selectedDateTime.set(Calendar.MONTH, month);
+                    selectedDateTime.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                    updateDateText();
+                },
+                selectedDateTime.get(Calendar.YEAR),
+                selectedDateTime.get(Calendar.MONTH),
+                selectedDateTime.get(Calendar.DAY_OF_MONTH)
+        );
+        datePickerDialog.show();
+    }
+
+    private void updateDateText() {
+        // Format date based on whether it's today, tomorrow, or a future date
+        Calendar today = Calendar.getInstance();
+        Calendar tomorrow = Calendar.getInstance();
+        tomorrow.add(Calendar.DAY_OF_YEAR, 1);
+        
+        if (isSameDay(selectedDateTime, today)) {
+            dateTextView.setText("Today");
+        } else if (isSameDay(selectedDateTime, tomorrow)) {
+            dateTextView.setText("Tomorrow");
+        } else {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMM d", Locale.getDefault());
+            dateTextView.setText(dateFormat.format(selectedDateTime.getTime()));
+        }
+    }
+
+    private boolean isSameDay(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+    }
+
+    private void showTimePicker() {
+        TimePickerDialog timePickerDialog = new TimePickerDialog(
+                this,
+                (view, hourOfDay, minute) -> {
+                    selectedDateTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    selectedDateTime.set(Calendar.MINUTE, minute);
+                    updateTimeText();
+                },
+                selectedDateTime.get(Calendar.HOUR_OF_DAY),
+                selectedDateTime.get(Calendar.MINUTE),
+                false
+        );
+        timePickerDialog.show();
+    }
+
+    private void updateTimeText() {
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.getDefault());
+        timeTextView.setText(timeFormat.format(selectedDateTime.getTime()));
+    }
+
+    private void setPriority(String priority) {
+        taskPriority = priority;
+        
+        // Update UI to reflect selected priority
+        lowPriorityButton.setBackgroundResource(priority.equals("low") ? 
+                R.color.priority_low : R.drawable.priority_button_background);
+        mediumPriorityButton.setBackgroundResource(priority.equals("medium") ? 
+                R.color.priority_medium : R.drawable.priority_button_background);
+        highPriorityButton.setBackgroundResource(priority.equals("high") ? 
+                R.color.priority_high : R.drawable.priority_button_background);
+    }
+
+    private void startVoiceInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak your task...");
+        
+        try {
+            startActivityForResult(intent, REQUEST_VOICE_INPUT);
+        } catch (Exception e) {
+            Toast.makeText(this, "Voice input not supported on this device", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showImageSourceDialog() {
+        String[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add Image");
+        builder.setItems(options, (dialog, which) -> {
+            if (which == 0) {
+                // Take photo
+                checkCameraPermissionAndOpenCamera();
+            } else if (which == 1) {
+                // Choose from gallery
+                openGallery();
+            } else {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+    private void checkCameraPermissionAndOpenCamera() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) 
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, 
+                    new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+        } else {
+            openCamera();
+        }
+    }
+
+    private void openCamera() {
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (cameraIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(cameraIntent, REQUEST_CAMERA_IMAGE);
+        } else {
+            Toast.makeText(this, "No camera app found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void openGallery() {
+        Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        galleryIntent.setType("image/*");
+        startActivityForResult(galleryIntent, REQUEST_GALLERY_IMAGE);
+    }
+
+    private void processImage(Bitmap bitmap) {
+        // Set image preview
+        taskImagePreview.setImageBitmap(bitmap);
+        imagePreviewCard.setVisibility(View.VISIBLE);
+        
+        // Simple placeholder for ML Kit object detection
+        // In a real app, you would integrate ML Kit here
+        detectedObjectsText.setText("Detected: Task-related objects");
     }
 
     @Override

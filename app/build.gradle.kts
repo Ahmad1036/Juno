@@ -56,6 +56,10 @@ android {
         
         // Networking
         implementation("com.squareup.okhttp3:okhttp:4.11.0")
+        implementation("com.android.volley:volley:1.2.1")
+        
+        // JSON processing
+        implementation("com.google.code.gson:gson:2.10.1")
 
         implementation(libs.appcompat)
         implementation(libs.material)
@@ -66,4 +70,7 @@ android {
         androidTestImplementation(libs.ext.junit)
         androidTestImplementation(libs.espresso.core)
     }
+}
+dependencies {
+    implementation(libs.volley)
 }

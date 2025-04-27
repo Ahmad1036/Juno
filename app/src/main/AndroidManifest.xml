@@ -8,8 +8,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" 
                      android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
     <application
+        android:name=".JunoApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -29,6 +32,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".CalendarActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Juno.NoActionBar" />
         <activity
             android:name=".CreateTaskActivity"
             android:exported="false"
@@ -107,21 +114,39 @@
             android:exported="false"
             android:theme="@style/Theme.Juno.NoActionBar" />
         <activity
-            android:name=".CalendarActivity"
-            android:exported="false" 
-            android:theme="@style/Theme.Juno.NoActionBar" />
-        <activity
-            android:name=".DayCalendarActivity"
-            android:exported="false" 
-            android:theme="@style/Theme.Juno.NoActionBar" />
-        <activity
-            android:name=".AddEditEventActivity"
-            android:exported="false" 
-            android:theme="@style/Theme.Juno.NoActionBar" />
-        <activity
             android:name=".NotesSummarizerActivity"
             android:exported="false" 
             android:theme="@style/Theme.Juno.NoActionBar" />
+        <activity
+            android:name=".ChecklistGeneratorActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Juno.NoActionBar" />
+        <activity
+            android:name=".ChecklistResultActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Juno.NoActionBar" />
+        <activity
+            android:name=".ReminderSettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:screenOrientation="portrait" />
+            
+        <!-- Background service for syncing tasks -->
+        <service
+            android:name=".services.SyncService"
+            android:exported="false" />
+            
+        <!-- Network state change receiver -->
+        <receiver
+            android:name=".receivers.NetworkReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".receivers.ReminderReceiver"
+            android:exported="false" />
     </application>
 
 </manifest>

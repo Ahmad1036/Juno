@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    tools:context=".ChecklistResultActivity">
+
+    <!-- Top Bar -->
+    <LinearLayout
+        android:id="@+id/header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/back_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_back"
+            android:tint="#FFFFFF"
+            android:contentDescription="Back" />
+
+        <TextView
+            android:id="@+id/title_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:text="Generated Checklist"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <!-- Subtitle -->
+    <TextView
+        android:id="@+id/subtitle_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/header_layout"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="8dp"
+        android:text="Your tasks have been broken down into subtasks"
+        android:textColor="#AAAAAA"
+        android:fontFamily="@font/dots_all_for_now_jl_family"
+        android:textSize="14sp" />
+
+    <!-- Divider -->
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/subtitle_text"
+        android:background="#333333"
+        android:alpha="0.5" />
+
+    <!-- Subtasks RecyclerView -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/subtask_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/divider"
+        android:layout_above="@id/button_container"
+        android:padding="8dp"
+        android:clipToPadding="false" />
+
+    <!-- Loading View -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:indeterminateTint="@color/purple_500" />
+
+        <TextView
+            android:id="@+id/loading_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Generating subtasks..."
+            android:textColor="#AAAAAA"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- Button Container -->
+    <LinearLayout
+        android:id="@+id/button_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:padding="16dp"
+        android:elevation="8dp"
+        android:background="#000000">
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save Subtasks"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            style="@style/Widget.MaterialComponents.Button" />
+    </LinearLayout>
+
+</RelativeLayout> 

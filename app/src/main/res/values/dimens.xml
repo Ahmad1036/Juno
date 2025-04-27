@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Layout padding dimensions -->
+    <dimen name="padding_compact">8dp</dimen>
+    <dimen name="padding_comfortable">16dp</dimen>
+    
+    <!-- Font sizes -->
+    <dimen name="text_size_small">12sp</dimen>
+    <dimen name="text_size_medium">16sp</dimen>
+    <dimen name="text_size_large">20sp</dimen>
+    <dimen name="text_size_xlarge">24sp</dimen>
+</resources> 

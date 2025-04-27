@@ -1,349 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="@color/dashboard_background"
+    tools:context=".CalendarActivity">
 
     <!-- Top Bar -->
     <RelativeLayout
-        android:id="@+id/calendar_top_bar"
+        android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="16dp"
+        app:layout_constraintTop_toTopOf="parent">
 
+        <!-- Back Button -->
         <ImageButton
-            android:id="@+id/calendar_back_button"
+            android:id="@+id/back_button"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Back"
-            android:src="@drawable/ic_back"
+            android:src="@drawable/arrow_back"
             android:tint="#FFFFFF" />
 
+        <!-- Title -->
         <TextView
             android:id="@+id/calendar_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="16dp"
-            android:layout_toEndOf="@id/calendar_back_button"
+            android:layout_centerHorizontal="true"
+            android:text="task calendar"
+            android:textColor="@color/dashboard_text_primary"
             android:fontFamily="@font/dots_all_for_now_jl_family"
-            android:text="calendar"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp" />
-
-        <ImageButton
-            android:id="@+id/add_event_button"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Add Event"
-            android:src="@drawable/add_btn"
-            android:tint="#FFFFFF" />
+            android:textSize="18sp" />
     </RelativeLayout>
 
-    <!-- Calendar View Toggle -->
-    <LinearLayout
-        android:id="@+id/calendar_toggle_container"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/calendar_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/calendar_top_bar"
-        android:background="#1A1A1A"
-        android:orientation="horizontal"
-        android:padding="8dp">
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="@color/dashboard_card_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/top_bar">
 
-        <TextView
-            android:id="@+id/toggle_day"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/calendar_toggle_selected"
-            android:fontFamily="@font/dots_all_for_now_jl_family"
-            android:gravity="center"
-            android:padding="8dp"
-            android:text="day"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/toggle_week"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fontFamily="@font/dots_all_for_now_jl_family"
-            android:gravity="center"
-            android:padding="8dp"
-            android:text="week"
-            android:textColor="#AAAAAA"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/toggle_month"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:fontFamily="@font/dots_all_for_now_jl_family"
-            android:gravity="center"
-            android:padding="8dp"
-            android:text="month"
-            android:textColor="#AAAAAA"
-            android:textSize="14sp" />
-    </LinearLayout>
-
-    <!-- Date Navigation -->
-    <RelativeLayout
-        android:id="@+id/date_navigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/calendar_toggle_container"
-        android:padding="16dp">
-
-        <ImageButton
-            android:id="@+id/previous_date"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Previous"
-            android:src="@drawable/ic_previous"
-            android:tint="#FFFFFF" />
-
-        <TextView
-            android:id="@+id/current_date_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:fontFamily="@font/dots_all_for_now_jl_family"
-            android:text="April 27, 2025"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp" />
-
-        <ImageButton
-            android:id="@+id/next_date"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Next"
-            android:src="@drawable/ic_next"
-            android:tint="#FFFFFF" />
-    </RelativeLayout>
-
-    <!-- Calendar Views Container (FrameLayout to switch between day/week/month views) -->
-    <FrameLayout
-        android:id="@+id/calendar_view_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/date_navigation">
-
-        <!-- Day View (Default View) -->
-        <LinearLayout
-            android:id="@+id/day_view"
+        <com.example.juno.view.PriorityCalendarView
+            android:id="@+id/calendarView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:background="@color/dashboard_card_background"
+            android:dateTextAppearance="@style/CalendarDateTextAppearance"
+            android:weekDayTextAppearance="@style/CalendarWeekDayTextAppearance"
+            android:theme="@style/CalendarTheme" />
+    </com.google.android.material.card.MaterialCardView>
 
-            <!-- RecyclerView for events list -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/events_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:visibility="gone" />
-
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <LinearLayout
-                    android:id="@+id/day_events_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <!-- Time slots for the day will be added here programmatically -->
-                    <!-- Example time slot -->
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp">
-
-                        <TextView
-                            android:layout_width="56dp"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/dots_all_for_now_jl_family"
-                            android:text="8:00"
-                            android:textColor="#AAAAAA"
-                            android:textSize="14sp" />
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_centerVertical="true"
-                            android:layout_marginStart="56dp"
-                            android:background="#333333" />
-                    </RelativeLayout>
-
-                    <!-- Example event card -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="56dp"
-                        android:layout_marginTop="32dp"
-                        android:layout_marginBottom="16dp"
-                        app:cardBackgroundColor="#1A1A1A"
-                        app:cardCornerRadius="8dp"
-                        app:cardElevation="0dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:fontFamily="@font/dots_all_for_now_jl_family"
-                                android:text="Team Meeting 📝"
-                                android:textColor="#FFFFFF"
-                                android:textSize="14sp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="4dp"
-                                android:fontFamily="@font/dots_all_for_now_jl_family"
-                                android:text="9:00 - 10:00"
-                                android:textColor="#AAAAAA"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-                </LinearLayout>
-            </ScrollView>
-        </LinearLayout>
-
-        <!-- Week View (Initially Hidden) -->
-        <LinearLayout
-            android:id="@+id/week_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <!-- Day columns will be added here programmatically -->
-                    <!-- Example day column -->
-                    <LinearLayout
-                        android:layout_width="280dp"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:background="#1A1A1A"
-                            android:fontFamily="@font/dots_all_for_now_jl_family"
-                            android:gravity="center"
-                            android:padding="12dp"
-                            android:text="Mon, Apr 27"
-                            android:textColor="#FFFFFF"
-                            android:textSize="14sp" />
-
-                        <ScrollView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:padding="8dp">
-
-                                <!-- Example event card -->
-                                <androidx.cardview.widget.CardView
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginBottom="8dp"
-                                    app:cardBackgroundColor="#1A1A1A"
-                                    app:cardCornerRadius="8dp"
-                                    app:cardElevation="0dp">
-
-                                    <LinearLayout
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:orientation="vertical"
-                                        android:padding="12dp">
-
-                                        <TextView
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:fontFamily="@font/dots_all_for_now_jl_family"
-                                            android:text="Team Meeting 📝"
-                                            android:textColor="#FFFFFF"
-                                            android:textSize="14sp" />
-
-                                        <TextView
-                                            android:layout_width="wrap_content"
-                                            android:layout_height="wrap_content"
-                                            android:layout_marginTop="4dp"
-                                            android:fontFamily="@font/dots_all_for_now_jl_family"
-                                            android:text="9:00 - 10:00"
-                                            android:textColor="#AAAAAA"
-                                            android:textSize="12sp" />
-                                    </LinearLayout>
-                                </androidx.cardview.widget.CardView>
-                            </LinearLayout>
-                        </ScrollView>
-                    </LinearLayout>
-                </LinearLayout>
-            </HorizontalScrollView>
-        </LinearLayout>
-
-        <!-- Month View (Initially Hidden) -->
-        <LinearLayout
-            android:id="@+id/month_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:visibility="gone">
-
-            <GridView
-                android:id="@+id/month_grid"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:numColumns="7"
-                android:padding="8dp"
-                android:stretchMode="columnWidth" />
-        </LinearLayout>
-    </FrameLayout>
-
-    <!-- Floating Action Button for Add Event -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add_event"
+    <TextView
+        android:id="@+id/task_details_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="16dp"
-        android:backgroundTint="#333333"
-        android:contentDescription="Add Event"
-        android:src="@drawable/add_btn"
-        app:tint="#FFFFFF" />
-</RelativeLayout> 
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="tasks for selected date"
+        android:textColor="@color/dashboard_text_primary"
+        android:fontFamily="@font/dots_all_for_now_jl_family"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/calendar_card" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/task_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/task_details_title" />
+
+    <TextView
+        android:id="@+id/no_tasks_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="no tasks for this day"
+        android:textColor="@color/dashboard_text_secondary"
+        android:fontFamily="@font/dots_all_for_now_jl_family"
+        android:textSize="14sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/task_details_title" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:indeterminateTint="@color/dashboard_text_primary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout> 

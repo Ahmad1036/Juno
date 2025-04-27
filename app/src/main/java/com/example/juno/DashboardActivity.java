@@ -2,9 +2,12 @@ package com.example.juno;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,6 +26,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import com.example.juno.utils.NetworkManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,6 +50,7 @@ public class DashboardActivity extends AppCompatActivity {
     private CardView calendarCard;
     private CardView suggestionsCard;
     private CardView notesSummarizerCard;
+    private CardView checklistGeneratorCard;
     private CardView dailyMotivationCard;
     private TextView dailyQuoteText;
     private ImageButton settingsButton;
@@ -89,6 +95,7 @@ public class DashboardActivity extends AppCompatActivity {
         calendarCard = findViewById(R.id.calendar_card);
         suggestionsCard = findViewById(R.id.suggestions_card);
         notesSummarizerCard = findViewById(R.id.notes_summarizer_card);
+        checklistGeneratorCard = findViewById(R.id.checklist_generator_card);
         dailyMotivationCard = findViewById(R.id.daily_motivation_card);
         dailyQuoteText = findViewById(R.id.daily_quote_text);
         settingsButton = findViewById(R.id.settings_button);
@@ -124,6 +131,9 @@ public class DashboardActivity extends AppCompatActivity {
         
         // Load daily motivational quote
         loadDailyQuote();
+
+        // Set up network status indicator
+        setupNetworkStatusIndicator();
     }
     
     @Override
@@ -203,11 +213,12 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Calendar card click
+        // Calendar card click - now opens the new CalendarActivity
         calendarCard.setOnClickListener(v -> {
-            // Navigate to Calendar screen
+            // Open the calendar activity
             Intent intent = new Intent(DashboardActivity.this, CalendarActivity.class);
             startActivity(intent);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
         
         // Create Task card click (new)
@@ -234,6 +245,13 @@ public class DashboardActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // Checklist Generator card click
+        checklistGeneratorCard.setOnClickListener(v -> {
+            Intent intent = new Intent(DashboardActivity.this, ChecklistGeneratorActivity.class);
+            startActivity(intent);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        });
+
         // Settings button click
         settingsButton.setOnClickListener(v -> {
             // Navigate to Settings screen
@@ -246,7 +264,8 @@ public class DashboardActivity extends AppCompatActivity {
         // Animate UI elements to fade in sequentially
         View[] views = {
             dateTimeText, greetingText, moodText,
-            tasksCard, journalCard, calendarCard, suggestionsCard, notesSummarizerCard, dailyMotivationCard,
+            tasksCard, journalCard, calendarCard, suggestionsCard, notesSummarizerCard, 
+            checklistGeneratorCard, dailyMotivationCard,
             settingsButton
         };
         
@@ -530,5 +549,59 @@ public class DashboardActivity extends AppCompatActivity {
         
         // Set the quote text
         dailyQuoteText.setText(dailyQuote);
+    }
+
+    /**
+     * Set up network status indicator in the dashboard
+     */
+    private void setupNetworkStatusIndicator() {
+        // Find or create a container for the network status
+        View rootView = findViewById(android.R.id.content);
+        LinearLayout container = new LinearLayout(this);
+        container.setId(View.generateViewId());
+        container.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        container.setOrientation(LinearLayout.HORIZONTAL);
+        container.setGravity(Gravity.CENTER_VERTICAL);
+        container.setPadding(16, 8, 16, 8);
+        container.setBackgroundColor(getResources().getColor(R.color.primary_light));
+        container.setVisibility(View.GONE); // Hide initially
+        
+        // Create icon
+        ImageView iconView = new ImageView(this);
+        iconView.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT));
+        iconView.setImageResource(android.R.drawable.ic_dialog_info);
+        iconView.setColorFilter(Color.WHITE);
+        
+        // Create text
+        TextView textView = new TextView(this);
+        LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        textParams.setMarginStart(16);
+        textView.setLayoutParams(textParams);
+        textView.setTextColor(Color.WHITE);
+        textView.setText("You are offline. Changes will be saved locally.");
+        
+        // Add views
+        container.addView(iconView);
+        container.addView(textView);
+        
+        // Add to root
+        ViewGroup parent = (ViewGroup) rootView;
+        parent.addView(container, 0); // Add at the top
+        
+        // Monitor network state
+        NetworkManager networkManager = new NetworkManager(this);
+        networkManager.getNetworkAvailability().observe(this, isNetworkAvailable -> {
+            if (isNetworkAvailable) {
+                container.setVisibility(View.GONE);
+            } else {
+                container.setVisibility(View.VISIBLE);
+            }
+        });
     }
 } 

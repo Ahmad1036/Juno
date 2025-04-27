@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:backgroundTint="#000000"
+    tools:context=".ReminderSettingsActivity">
+
+    <!-- Top Bar -->
+    <LinearLayout
+        android:id="@+id/header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/back_button"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="Back"
+            android:src="@drawable/ic_back"
+            android:tint="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/title_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:text="Smart Reminders &amp; Nudges"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/header_layout"
+        android:alpha="0.5"
+        android:background="#333333" />
+
+    <!-- Main Content Scroll View -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/button_container"
+        android:layout_below="@id/divider"
+        android:clipToPadding="false"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Productive Hours Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:text="Productive Hours"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:text="When are you most productive? We'll try to send reminders during these hours."
+                android:textColor="#AAAAAA"
+                android:textSize="14sp" />
+
+            <!-- Start Time -->
+            <TextView
+                android:id="@+id/productive_hours_start_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:text="Start: 9:00 AM"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+
+            <SeekBar
+                android:id="@+id/productive_hours_start_seekbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:progressTint="#6200EE"
+                android:thumbTint="#6200EE" />
+
+            <!-- End Time -->
+            <TextView
+                android:id="@+id/productive_hours_end_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:text="End: 6:00 PM"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+
+            <SeekBar
+                android:id="@+id/productive_hours_end_seekbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:progressTint="#6200EE"
+                android:thumbTint="#6200EE" />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:alpha="0.5"
+                android:background="#333333" />
+
+            <!-- Reminder Style Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:text="Reminder Style"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:text="Choose how assertive you want your reminders to be."
+                android:textColor="#AAAAAA"
+                android:textSize="14sp" />
+
+            <RadioGroup
+                android:id="@+id/reminder_style_radio_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical">
+
+                <RadioButton
+                    android:id="@+id/gentle_style_radio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="#6200EE"
+                    android:checked="true"
+                    android:fontFamily="@font/dots_all_for_now_jl_family"
+                    android:text="Gentle"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:fontFamily="@font/dots_all_for_now_jl_family"
+                    android:text="'Just a friendly reminder about your task'"
+                    android:textColor="#AAAAAA"
+                    android:textSize="14sp" />
+
+                <RadioButton
+                    android:id="@+id/moderate_style_radio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:buttonTint="#6200EE"
+                    android:fontFamily="@font/dots_all_for_now_jl_family"
+                    android:text="Moderate"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:fontFamily="@font/dots_all_for_now_jl_family"
+                    android:text="'Don't forget about this task coming up soon'"
+                    android:textColor="#AAAAAA"
+                    android:textSize="14sp" />
+
+                <RadioButton
+                    android:id="@+id/assertive_style_radio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:buttonTint="#6200EE"
+                    android:fontFamily="@font/dots_all_for_now_jl_family"
+                    android:text="Assertive"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:fontFamily="@font/dots_all_for_now_jl_family"
+                    android:text="'Your task deadline is coming up quickly!'"
+                    android:textColor="#AAAAAA"
+                    android:textSize="14sp" />
+            </RadioGroup>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="24dp"
+                android:alpha="0.5"
+                android:background="#333333" />
+
+            <!-- Advance Reminder Time Section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:text="Deadline Reminders"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:text="How far in advance should we remind you about task deadlines?"
+                android:textColor="#AAAAAA"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/advance_time_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/dots_all_for_now_jl_family"
+                android:text="Remind me 24 hours before deadline"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+
+            <SeekBar
+                android:id="@+id/advance_time_seekbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:progressTint="#6200EE"
+                android:thumbTint="#6200EE" />
+
+            <!-- Space at bottom for better scrolling -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="32dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Button Container -->
+    <LinearLayout
+        android:id="@+id/button_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#000000"
+        android:elevation="8dp"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/save_button"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#000000"
+            android:fontFamily="@font/dots_all_for_now_jl_family"
+            android:text="Save Settings"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+</RelativeLayout> 

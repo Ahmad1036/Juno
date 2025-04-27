@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="notification_styles">
+        <item>Standard</item>
+        <item>Compact</item>
+        <item>Expanded</item>
+        <item>Minimal</item>
+    </string-array>
+</resources> 
