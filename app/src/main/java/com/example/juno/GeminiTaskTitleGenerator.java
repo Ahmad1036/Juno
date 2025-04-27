@@ -20,7 +20,7 @@ import okhttp3.ResponseBody;
  */
 public class GeminiTaskTitleGenerator {
     private static final String TAG = "GeminiTaskTitleGen";
-    private static final String API_KEY = "AIzaSyADvfoNCVD3_Bh4xJ6MyInGNXSYl_PGhHc"; // Same key used in GeminiMoodAnalyzer
+    private static final String API_KEY = "AIzaSyDERj-B3a6NSI6qOJ7GbhBIinf0gWsZmR8"; // Same key used in GeminiMoodAnalyzer
     private static final String API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=" + API_KEY;
     
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");

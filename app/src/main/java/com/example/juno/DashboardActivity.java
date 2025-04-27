@@ -54,6 +54,7 @@ public class DashboardActivity extends AppCompatActivity {
     private CardView dailyMotivationCard;
     private TextView dailyQuoteText;
     private ImageButton settingsButton;
+    private ImageButton notificationButton;
     
     // Task-related views
     private RecyclerView dashboardTasksRecyclerView;
@@ -99,6 +100,7 @@ public class DashboardActivity extends AppCompatActivity {
         dailyMotivationCard = findViewById(R.id.daily_motivation_card);
         dailyQuoteText = findViewById(R.id.daily_quote_text);
         settingsButton = findViewById(R.id.settings_button);
+        notificationButton = findViewById(R.id.notification_button);
         
         // Initialize task views
         dashboardTasksRecyclerView = findViewById(R.id.dashboard_tasks_recycler_view);
@@ -257,6 +259,13 @@ public class DashboardActivity extends AppCompatActivity {
             // Navigate to Settings screen
             Intent intent = new Intent(DashboardActivity.this, SettingsActivity.class);
             startActivity(intent);
+        });
+        
+        // Notification button click
+        notificationButton.setOnClickListener(v -> {
+            Intent intent = new Intent(DashboardActivity.this, NotificationsActivity.class);
+            startActivity(intent);
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
     }
 

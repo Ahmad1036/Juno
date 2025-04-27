@@ -130,6 +130,10 @@
             android:exported="false"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".NotificationsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Juno.NoActionBar" />
             
         <!-- Background service for syncing tasks -->
         <service
